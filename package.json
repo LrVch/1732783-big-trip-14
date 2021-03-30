@@ -18,5 +18,9 @@
   },
   "engines": {
     "node": "10"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }
