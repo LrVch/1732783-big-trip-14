@@ -20,6 +20,7 @@
     "node": "10"
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

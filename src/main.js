@@ -23,7 +23,7 @@ const render = (container, template, place = PLACE_TO_INSERT.BEFORE_END) => {
 const mainElement = document.querySelector('.page-body');
 const tripMainElement = mainElement.querySelector('.trip-info');
 const navigationElement = mainElement.querySelector(
-  '.trip-controls__navigation'
+  '.trip-controls__navigation',
 );
 const filterElement = mainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = mainElement.querySelector('.trip-events');
@@ -36,7 +36,7 @@ render(tripEventsElement, createSortTemplate());
 render(tripEventsElement, createEventsListTemplate());
 
 const tripElentsListElement = tripEventsElement.querySelector(
-  '.trip-events__list'
+  '.trip-events__list',
 );
 
 render(tripElentsListElement, createEditEventTemplate());
