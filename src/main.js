@@ -7,7 +7,7 @@ import { createSortTemplate } from './view/sort';
 import { createTripCostTemplate } from './view/trip-cost';
 import { createTripInfoTemplate } from './view/trip-info';
 
-const PLACE_TO_INSERT = {
+const palceToInsert = {
   BEFORE_END: 'beforeEnd',
   BEFORE_BEGIN: 'beforeBegin',
   AFTER_END: 'afterEnd',
@@ -16,7 +16,7 @@ const PLACE_TO_INSERT = {
 
 const EVENTS_COUNT = 3;
 
-const render = (container, template, place = PLACE_TO_INSERT.BEFORE_END) => {
+const render = (container, template, place = palceToInsert.BEFORE_END) => {
   container.insertAdjacentHTML(place, template);
 };
 
