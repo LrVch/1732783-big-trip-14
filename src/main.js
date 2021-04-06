@@ -7,6 +7,16 @@ import { createSortTemplate } from './view/sort';
 import { createTripCostTemplate } from './view/trip-cost';
 import { createTripInfoTemplate } from './view/trip-info';
 
+import { generateDestinations, generateEvent, offers } from './mock/event';
+import { EVENT_TYPES } from './constants';
+import {
+  caclucateEventsCities,
+  caclucateEventsDates,
+  calculateFilterDisableState,
+  // eslint-disable-next-line comma-dangle
+  calculateTotal,
+} from './utils';
+
 const palceToInsert = {
   BEFORE_END: 'beforeEnd',
   BEFORE_BEGIN: 'beforeBegin',
@@ -14,7 +24,9 @@ const palceToInsert = {
   AFTER_BEGIN: 'afterBegin',
 };
 
-const EVENTS_COUNT = 3;
+const EVENTS_COUNT = 2;
+
+const events = Array(EVENTS_COUNT).fill().map(generateEvent);
 
 const render = (container, template, place = palceToInsert.BEFORE_END) => {
   container.insertAdjacentHTML(place, template);
@@ -28,10 +40,19 @@ const navigationElement = mainElement.querySelector(
 const filterElement = mainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = mainElement.querySelector('.trip-events');
 
-render(tripMainElement, createTripInfoTemplate());
-render(tripMainElement, createTripCostTemplate());
+render(
+  tripMainElement,
+  createTripInfoTemplate({
+    cities: caclucateEventsCities(events),
+    dates: caclucateEventsDates(events),
+  }),
+);
+render(tripMainElement, createTripCostTemplate(calculateTotal(events)));
 render(navigationElement, createNavigationTemplate());
-render(filterElement, createFilterTemplate());
+render(
+  filterElement,
+  createFilterTemplate(calculateFilterDisableState(events)),
+);
 render(tripEventsElement, createSortTemplate());
 render(tripEventsElement, createEventsListTemplate());
 
@@ -39,8 +60,17 @@ const tripElentsListElement = tripEventsElement.querySelector(
   '.trip-events__list',
 );
 
-render(tripElentsListElement, createEditEventTemplate());
+render(
+  tripElentsListElement,
+  createEditEventTemplate(
+    EVENT_TYPES,
+    generateDestinations(),
+    offers,
+    // undefined,
+    events[0],
+  ),
+);
 
-for (let i = 0; i < EVENTS_COUNT; i++) {
-  render(tripElentsListElement, createEventTemplate());
+for (let i = 1; i < EVENTS_COUNT; i++) {
+  render(tripElentsListElement, createEventTemplate(events[i]));
 }
