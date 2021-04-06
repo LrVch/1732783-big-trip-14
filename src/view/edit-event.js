@@ -13,20 +13,24 @@ const getDestinationItem = (eventType) => (type) => {
   </div>`;
 };
 
-const getEventOffers = (offerIds) => ({ id, name, price }) => {
-  return `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden"
-      id="event-offer-${id}"
-      type="checkbox"
-      name="event-offer-luggage"
-      ${id in offerIds ? 'checked' : ''}
-    >
-    <label class="event__offer-label" for="event-offer-${id}">
-      <span class="event__offer-title">${name}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${price}</span>
-    </label>
-  </div>`;
+const getEventOffers = (availableOffers = [], offerIds) => {
+  return availableOffers
+    .map(
+      ({ id, name, price }) => `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden"
+          id="event-offer-${id}"
+          type="checkbox"
+          name="event-offer-luggage"
+          ${id in offerIds ? 'checked' : ''}
+        >
+        <label class="event__offer-label" for="event-offer-${id}">
+          <span class="event__offer-title">${name}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${price}</span>
+        </label>
+      </div>`,
+    )
+    .join('');
 };
 
 const getTypeImage = (type) =>
@@ -35,7 +39,7 @@ const getTypeImage = (type) =>
     : '';
 
 const getDestinationOptions = (destinations) =>
-  destinations.map(({ name }) => `<option value="${name}"></option>`);
+  destinations.map(({ name }) => `<option value="${name}"></option>`).join('');
 
 const getOffersTitle = (isShow) =>
   isShow
@@ -158,7 +162,7 @@ export const createEditEventTemplate = (
         ${getOffersTitle(availableOffers[type])}
 
           <div class="event__available-offers">
-            ${(availableOffers[type] || []).map(getEventOffers(offerIds))}
+            ${getEventOffers(availableOffers[type] || [], offerIds)}
           </div>
         </section>
 
