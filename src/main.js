@@ -24,7 +24,7 @@ const palceToInsert = {
   AFTER_BEGIN: 'afterBegin',
 };
 
-const EVENTS_COUNT = 2;
+const EVENTS_COUNT = 20;
 
 const events = Array(EVENTS_COUNT).fill().map(generateEvent);
 
