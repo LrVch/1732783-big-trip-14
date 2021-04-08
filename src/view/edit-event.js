@@ -46,6 +46,19 @@ const getOffersTitle = (isShow) =>
     ? '<h3 class="event__section-title event__section-title--offers">Offers</h3>'
     : '';
 
+const getOffersSection = (availableOffers = [], offerIds, type) => {
+  const isAwailableOffers = (availableOffers[type] || []).length;
+  return isAwailableOffers
+    ? `<section class="event__section  event__section--offers">
+    ${getOffersTitle(availableOffers[type])}
+
+    <div class="event__available-offers">
+      ${getEventOffers(availableOffers[type] || [], offerIds)}
+    </div>
+  </section>`
+    : '';
+};
+
 const getEventCloseButton = (isEdit) =>
   isEdit
     ? `<button class="event__rollup-btn" type="button">
@@ -158,13 +171,7 @@ export const createEditEventTemplate = (
       </header>
 
       <section class="event__details">
-        <section class="event__section  event__section--offers">
-        ${getOffersTitle(availableOffers[type])}
-
-          <div class="event__available-offers">
-            ${getEventOffers(availableOffers[type] || [], offerIds)}
-          </div>
-        </section>
+        ${getOffersSection(availableOffers, offerIds, type)}
 
         ${getDestination(currentDestination)}
       </section>

@@ -31,18 +31,18 @@ const SHORT_DESCRIPTIONS = [
 
 const MAX_DAYS_GAP = 7;
 
-const getRandomInAray = (array) => getRandomInteger(0, array.length - 1);
+const getRandomElementInAray = (array) => {
+  const randomIndex = getRandomInteger(0, array.length - 1);
+
+  return array[randomIndex];
+};
 
 const generateDescription = () => {
-  const randomIndex = getRandomInAray(LONG_DESCRIPTIONS);
-
-  return LONG_DESCRIPTIONS[randomIndex];
+  return getRandomElementInAray(LONG_DESCRIPTIONS);
 };
 
 const generateOfferName = () => {
-  const randomIndex = getRandomInAray(SHORT_DESCRIPTIONS);
-
-  return SHORT_DESCRIPTIONS[randomIndex];
+  return getRandomElementInAray(SHORT_DESCRIPTIONS);
 };
 
 const generatePictures = () => {
@@ -109,6 +109,7 @@ const generateOffers = () => {
 };
 
 export const offers = generateOffers();
+export const destinations = generateDestinations();
 
 export const generateEvent = () => {
   const dates = generateDates();
@@ -120,7 +121,7 @@ export const generateEvent = () => {
     isFavorite: Boolean(getRandomInteger(0, 1)),
     startDate: dates.startDate,
     endDate: dates.endDate,
-    destination: generateDestination(),
+    destination: getRandomElementInAray(destinations),
     offers: typesWithOffers.includes(type) ? offers[type] : undefined,
   };
 };

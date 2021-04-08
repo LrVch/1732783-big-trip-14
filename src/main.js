@@ -7,7 +7,7 @@ import { createSortTemplate } from './view/sort';
 import { createTripCostTemplate } from './view/trip-cost';
 import { createTripInfoTemplate } from './view/trip-info';
 
-import { generateDestinations, generateEvent, offers } from './mock/event';
+import { destinations, generateEvent, offers } from './mock/event';
 import { EVENT_TYPES } from './constants';
 import {
   caclucateEventsCities,
@@ -64,7 +64,7 @@ render(
   tripElentsListElement,
   createEditEventTemplate(
     EVENT_TYPES,
-    generateDestinations(),
+    destinations,
     offers,
     // undefined,
     events[0],

@@ -1,5 +1,5 @@
 import {
-  firstLetteToUpperCase,
+  changeRirstLetteToUpperCase,
   formatToShortDay,
   formatToDateTime,
   formatToFullDateTime,
@@ -40,7 +40,7 @@ export const createEventTemplate = (event = {}) => {
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">
-        ${firstLetteToUpperCase(type)}
+        ${changeRirstLetteToUpperCase(type)}
         ${destination.name}
       </h3>
       <div class="event__schedule">

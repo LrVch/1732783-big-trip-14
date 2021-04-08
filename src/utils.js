@@ -8,7 +8,7 @@ export const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-export const firstLetteToUpperCase = (str) =>
+export const changeRirstLetteToUpperCase = (str) =>
   str.length ? str[0].toUpperCase() + str.slice(1) : '';
 
 export const formatToShortDay = (date) =>
@@ -49,11 +49,11 @@ export const getDateTimeParts = (duration) => {
 export const getFormatedParts = (duration, withDay) => {
   const { days, hours, minutes } = getDateTimeParts(duration);
 
-  const daysRes = withDay ? (days < 10 ? '0' + days : days) + 'D ' : '';
-  const hoursRes = (hours < 10 ? '0' + hours : hours) + 'H ';
-  const minutesRes = (minutes < 10 ? '0' + minutes : minutes) + 'M';
+  const daysResult = withDay ? (days < 10 ? '0' + days : days) + 'D ' : '';
+  const hoursResult = (hours < 10 ? '0' + hours : hours) + 'H ';
+  const minutesResult = (minutes < 10 ? '0' + minutes : minutes) + 'M';
 
-  return `${daysRes}${hoursRes}${minutesRes}`;
+  return `${daysResult}${hoursResult}${minutesResult}`;
 };
 
 export const formatToDuration = (duration) => {
