@@ -115,7 +115,7 @@ export const generateEvent = () => {
   const type = getRandomType();
 
   return {
-    type: getRandomType(),
+    type,
     price: getRandomInteger(10, 500),
     isFavorite: Boolean(getRandomInteger(0, 1)),
     startDate: dates.startDate,
