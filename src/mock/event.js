@@ -17,28 +17,32 @@ export const CITIES = [
   'Челябинск',
 ];
 
+const LONG_DESCRIPTIONS = [
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget.',
+  'Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
+  'Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.',
+];
+
+const SHORT_DESCRIPTIONS = [
+  'Lorem ipsum dolor',
+  'Fusce tristique felis',
+  'Sed sed nisi sed augue convallis',
+];
+
+const MAX_DAYS_GAP = 7;
+
+const getRandomInAray = (array) => getRandomInteger(0, array.length - 1);
+
 const generateDescription = () => {
-  const descriptions = [
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget.',
-    'Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
-    'Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.',
-  ];
+  const randomIndex = getRandomInAray(LONG_DESCRIPTIONS);
 
-  const randomIndex = getRandomInteger(0, descriptions.length - 1);
-
-  return descriptions[randomIndex];
+  return LONG_DESCRIPTIONS[randomIndex];
 };
 
 const generateOfferName = () => {
-  const descriptions = [
-    'Lorem ipsum dolor',
-    'Fusce tristique felis',
-    'Sed sed nisi sed augue convallis',
-  ];
+  const randomIndex = getRandomInAray(SHORT_DESCRIPTIONS);
 
-  const randomIndex = getRandomInteger(0, descriptions.length - 1);
-
-  return descriptions[randomIndex];
+  return SHORT_DESCRIPTIONS[randomIndex];
 };
 
 const generatePictures = () => {
@@ -53,8 +57,7 @@ const generatePictures = () => {
 const getRandomType = () => EVENT_TYPES[getRandomInteger(0, 7)];
 
 const generateDates = () => {
-  const maxDaysGap = 7;
-  const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
+  const daysGap = getRandomInteger(-MAX_DAYS_GAP, MAX_DAYS_GAP);
 
   const date = dayjs()
     .add(daysGap, 'day')
