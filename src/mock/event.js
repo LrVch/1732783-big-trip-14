@@ -72,9 +72,11 @@ const generateDates = () => {
   };
 };
 
-const generateDestination = (index) => {
+const generateDestination = (
+  index = getRandomInteger(0, CITIES.length - 1),
+) => {
   return {
-    name: CITIES[index || getRandomInteger(0, 9)],
+    name: CITIES[index],
     description: generateDescription(),
     pictures: generatePictures(),
   };
