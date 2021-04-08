@@ -84,25 +84,41 @@ export const calculateTotal = (events) => {
   return events.map(calculateEventPrice).reduce((acc, next) => acc + next, 0);
 };
 
+export const sortAsNumberByProp = (prop) => (a, b) => +a[prop] - +b[prop];
+
+export const sortByStartDate = sortAsNumberByProp('startDate');
+
+export const sortFromStartToEnd = (a, b) => {
+  if (dayjs(a.startDate).isSame(dayjs(b.startDate), 'day')) {
+    return +a.endDate - +b.endDate;
+  }
+
+  return +a.startDate - +b.startDate;
+};
+
 export const caclucateEventsCities = (events) => {
-  if (events.length > 3) {
-    return `${events[0].destination.name} — ... — ${
-      events[events.length - 1].destination.name
+  const sorted = events.slice().sort(sortFromStartToEnd);
+
+  if (sorted.length > 3) {
+    return `${sorted[0].destination.name} — ... — ${
+      sorted[sorted.length - 1].destination.name
     }`;
   }
 
-  return events.map((event) => event.destination.name).join(' — ');
+  return sorted.map((event) => event.destination.name).join(' — ');
 };
 
 export const caclucateEventsDates = (events) => {
-  if (events.length > 1) {
-    return `${formatToShortDay(events[0].startDate)}  — ${formatToShortDay(
-      events[events.length - 1].endDate,
+  const sorted = events.slice().sort(sortFromStartToEnd);
+
+  if (sorted.length > 1) {
+    return `${formatToShortDay(sorted[0].startDate)}  — ${formatToShortDay(
+      sorted[sorted.length - 1].endDate,
     )}`;
   }
 
-  return `${formatToShortDay(events[0].startDate)}  — ${formatToShortDay(
-    events[0].endDate,
+  return `${formatToShortDay(sorted[0].startDate)}  — ${formatToShortDay(
+    sorted[0].endDate,
   )}`;
 };
 
