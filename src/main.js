@@ -17,7 +17,7 @@ import {
   calculateTotal,
 } from './utils';
 
-const palceToInsert = {
+const PlaceToInsert = {
   BEFORE_END: 'beforeEnd',
   BEFORE_BEGIN: 'beforeBegin',
   AFTER_END: 'afterEnd',
@@ -28,7 +28,7 @@ const EVENTS_COUNT = 20;
 
 const events = Array(EVENTS_COUNT).fill().map(generateEvent);
 
-const render = (container, template, place = palceToInsert.BEFORE_END) => {
+const render = (container, template, place = PlaceToInsert.BEFORE_END) => {
   container.insertAdjacentHTML(place, template);
 };
 
