@@ -13,7 +13,7 @@ const getDestinationItem = (eventType) => (type) => {
   </div>`;
 };
 
-const getEventOffers = (availableOffers = [], offerIds) => {
+const getEventOffers = (availableOffers = [], offerIdsMap) => {
   return availableOffers
     .map(
       ({ id, name, price }) => `<div class="event__offer-selector">
@@ -21,7 +21,8 @@ const getEventOffers = (availableOffers = [], offerIds) => {
           id="event-offer-${id}"
           type="checkbox"
           name="event-offer-luggage"
-          ${id in offerIds ? 'checked' : ''}
+          ${id in offerIdsMap ? 'checked' : ''}
+          value=${id}
         >
         <label class="event__offer-label" for="event-offer-${id}">
           <span class="event__offer-title">${name}</span>
@@ -46,14 +47,14 @@ const getOffersTitle = (isShow) =>
     ? '<h3 class="event__section-title event__section-title--offers">Offers</h3>'
     : '';
 
-const getOffersSection = (availableOffers = [], offerIds, type) => {
+const getOffersSection = (availableOffers = [], offerIdsMap, type) => {
   const isAwailableOffers = (availableOffers[type] || []).length;
   return isAwailableOffers
     ? `<section class="event__section  event__section--offers">
     ${getOffersTitle(availableOffers[type])}
 
     <div class="event__available-offers">
-      ${getEventOffers(availableOffers[type] || [], offerIds)}
+      ${getEventOffers(availableOffers[type] || [], offerIdsMap)}
     </div>
   </section>`
     : '';
@@ -102,17 +103,17 @@ export const createEditEventTemplate = (
     destination: { name } = {
       name: '',
     },
-    offers = [],
+    offerIds,
   } = event;
 
   const currentDestination = destinations.find((elem) => elem.name === name);
 
   const isEdit = Object.keys(event).length;
 
-  const offerIds = offers.reduce((acc, next) => {
+  const offerIdsMap = offerIds.reduce((acc, id) => {
     return {
       ...acc,
-      [next.id]: true,
+      [id]: true,
     };
   }, {});
 
@@ -171,7 +172,7 @@ export const createEditEventTemplate = (
       </header>
 
       <section class="event__details">
-        ${getOffersSection(availableOffers, offerIds, type)}
+        ${getOffersSection(availableOffers, offerIdsMap, type)}
 
         ${getDestination(currentDestination)}
       </section>

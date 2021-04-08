@@ -114,6 +114,7 @@ export const destinations = generateDestinations();
 export const generateEvent = () => {
   const dates = generateDates();
   const type = getRandomType();
+  const eventOffers = typesWithOffers.includes(type) ? offers[type] : undefined;
 
   return {
     type,
@@ -122,6 +123,7 @@ export const generateEvent = () => {
     startDate: dates.startDate,
     endDate: dates.endDate,
     destination: getRandomElementInAray(destinations),
-    offers: typesWithOffers.includes(type) ? offers[type] : undefined,
+    offers: eventOffers,
+    offerIds: (eventOffers || []).map((offer) => offer.id),
   };
 };
