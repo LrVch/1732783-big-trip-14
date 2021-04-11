@@ -6,8 +6,8 @@ import {
   formatToTime,
   formatToDuration,
   calculateDuration,
-  // eslint-disable-next-line comma-dangle
   calculateEventPrice,
+  // eslint-disable-next-line comma-dangle
   createElement,
 } from '../utils';
 
