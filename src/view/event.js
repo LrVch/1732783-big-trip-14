@@ -6,8 +6,9 @@ import {
   formatToTime,
   formatToDuration,
   calculateDuration,
-  // eslint-disable-next-line comma-dangle
   calculateEventPrice,
+  // eslint-disable-next-line comma-dangle
+  createElement,
 } from '../utils';
 
 const getOfferTemplate = ({ price, name }) => {
@@ -18,7 +19,7 @@ const getOfferTemplate = ({ price, name }) => {
   </li>`;
 };
 
-export const createEventTemplate = (event = {}) => {
+const createEventTemplate = (event = {}) => {
   const {
     type,
     price,
@@ -80,3 +81,26 @@ export const createEventTemplate = (event = {}) => {
     </div>
   </li>`;
 };
+
+export default class Event {
+  constructor(event = {}) {
+    this._element = null;
+    this._event = event;
+  }
+
+  getTemplate() {
+    return createEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,4 +1,4 @@
-import { formatToPickedDateTime } from '../utils';
+import { createElement, formatToPickedDateTime } from '../utils';
 
 const getDestinationItem = (eventType) => (type) => {
   return `<div class="event__type-item">
@@ -179,3 +179,34 @@ export const createEditEventTemplate = (
     </form>
   </li>`;
 };
+
+export default class EditEvent {
+  constructor(eventTypes, destinations, offers, event) {
+    this._element = null;
+    this._event = event;
+    this._eventTypes = eventTypes;
+    this._destinations = destinations;
+    this._offers = offers;
+  }
+
+  getTemplate() {
+    return createEditEventTemplate(
+      this._eventTypes,
+      this._destinations,
+      this._offers,
+      this._event,
+    );
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
