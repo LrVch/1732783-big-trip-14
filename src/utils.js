@@ -1,6 +1,13 @@
 import dayjs from 'dayjs';
 import { DAY, ONE_HOUR } from './constants';
 
+export const PlaceToInsert = {
+  BEFORE_END: 'beforeEnd',
+  BEFORE_BEGIN: 'beforeBegin',
+  AFTER_END: 'afterEnd',
+  AFTER_BEGIN: 'afterBegin',
+};
+
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -96,7 +103,7 @@ export const sortFromStartToEnd = (a, b) => {
   return +a.startDate - +b.startDate;
 };
 
-export const caclucateEventsCities = (events) => {
+export const caclucateEventsCities = (events = []) => {
   const sorted = events.slice().sort(sortFromStartToEnd);
 
   if (sorted.length > 3) {
@@ -108,8 +115,12 @@ export const caclucateEventsCities = (events) => {
   return sorted.map((event) => event.destination.name).join(' — ');
 };
 
-export const caclucateEventsDates = (events) => {
+export const caclucateEventsDates = (events = []) => {
   const sorted = events.slice().sort(sortFromStartToEnd);
+
+  if (!sorted.len) {
+    return '';
+  }
 
   if (sorted.length > 1) {
     return `${formatToShortDay(sorted[0].startDate)}  — ${formatToShortDay(
@@ -135,4 +146,23 @@ export const calculateFilterDisableState = (events) => {
     isFuture: events.some((event) => isEventInFuture(event.startDate)),
     isPast: events.some((event) => isEventInPast(event.endDate)),
   };
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case PlaceToInsert.AFTER_BEGIN:
+      container.prepend(element);
+      break;
+    case PlaceToInsert.BEFORE_END:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
 };
