@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import Abstract from './abstarct';
 
 const createFilterTemplate = ({ isFuture, isPast } = {}) => {
   return `<form class="trip-filters" action="#" method="get">
@@ -25,25 +25,13 @@ const createFilterTemplate = ({ isFuture, isPast } = {}) => {
   </form>`;
 };
 
-export default class Filter {
+export default class Filter extends Abstract {
   constructor(filterState = {}) {
-    this._element = null;
+    super();
     this._filterState = filterState;
   }
 
   getTemplate() {
     return createFilterTemplate(this._filterState);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

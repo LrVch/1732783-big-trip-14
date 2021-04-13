@@ -6,10 +6,10 @@ import {
   formatToTime,
   formatToDuration,
   calculateDuration,
-  calculateEventPrice,
   // eslint-disable-next-line comma-dangle
-  createElement,
+  calculateEventPrice,
 } from '../utils';
+import Abstract from './abstarct';
 
 const getOfferTemplate = ({ price, name }) => {
   return `<li class="event__offer">
@@ -82,25 +82,13 @@ const createEventTemplate = (event = {}) => {
   </li>`;
 };
 
-export default class Event {
+export default class Event extends Abstract {
   constructor(event = {}) {
-    this._element = null;
+    super();
     this._event = event;
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

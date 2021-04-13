@@ -1,27 +1,15 @@
-import { createElement } from '../utils';
+import Abstract from './abstarct';
 
 const createNoEventsTemplate = () => {
   return '<p class="trip-events__msg">Click New Event to create your first point</p>';
 };
 
-export default class NoEvents {
+export default class NoEvents extends Abstract {
   constructor() {
-    this._element = null;
+    super();
   }
 
   getTemplate() {
     return createNoEventsTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
