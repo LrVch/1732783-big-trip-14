@@ -92,30 +92,20 @@ const renderEvent = (eventsListElement, task) => {
     }
   };
 
-  eventComponent
-    .getElement()
-    .querySelector('.event__rollup-btn')
-    .addEventListener('click', () => {
-      replaceEventToForm();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
+  eventComponent.setEditClickHandler(() => {
+    replaceEventToForm();
+    document.addEventListener('keydown', onEscKeyDown);
+  });
 
-  editEventComponent
-    .getElement()
-    .querySelector('form')
-    .addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceFormToEvent();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
+  editEventComponent.setSubmitHandler(() => {
+    replaceFormToEvent();
+    document.removeEventListener('keydown', onEscKeyDown);
+  });
 
-  editEventComponent
-    .getElement()
-    .querySelector('.event__rollup-btn')
-    .addEventListener('click', () => {
-      replaceFormToEvent();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
+  editEventComponent.setCancelHandler(() => {
+    replaceFormToEvent();
+    document.removeEventListener('keydown', onEscKeyDown);
+  });
 
   render(
     eventsListElement,
