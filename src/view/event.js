@@ -1,15 +1,15 @@
 import {
-  changeRirstLetteToUpperCase,
+  changeFirstLetteToUpperCase,
   formatToShortDay,
   formatToDateTime,
   formatToFullDateTime,
   formatToTime,
   formatToDuration,
   calculateDuration,
-  calculateEventPrice,
   // eslint-disable-next-line comma-dangle
-  createElement,
+  calculateEventPrice,
 } from '../utils';
+import Abstract from './abstarct';
 
 const getOfferTemplate = ({ price, name }) => {
   return `<li class="event__offer">
@@ -41,7 +41,7 @@ const createEventTemplate = (event = {}) => {
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">
-        ${changeRirstLetteToUpperCase(type)}
+        ${changeFirstLetteToUpperCase(type)}
         ${destination.name}
       </h3>
       <div class="event__schedule">
@@ -82,25 +82,25 @@ const createEventTemplate = (event = {}) => {
   </li>`;
 };
 
-export default class Event {
+export default class Event extends Abstract {
   constructor(event = {}) {
-    this._element = null;
+    super();
     this._event = event;
+    this._editClickHandler = this._editClickHandler.bind(this);
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler() {
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setEditClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement()
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this._editClickHandler);
   }
 }

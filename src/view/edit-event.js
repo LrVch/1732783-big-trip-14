@@ -1,4 +1,5 @@
-import { createElement, formatToPickedDateTime } from '../utils';
+import { formatToPickedDateTime } from '../utils';
+import Abstract from './abstarct';
 
 const getDestinationItem = (eventType) => (type) => {
   return `<div class="event__type-item">
@@ -180,13 +181,16 @@ export const createEditEventTemplate = (
   </li>`;
 };
 
-export default class EditEvent {
+export default class EditEvent extends Abstract {
   constructor(eventTypes, destinations, offers, event) {
-    this._element = null;
+    super();
     this._event = event;
     this._eventTypes = eventTypes;
     this._destinations = destinations;
     this._offers = offers;
+
+    this._submitHandler = this._submitHandler.bind(this);
+    this._cancelHandler = this._cancelHandler.bind(this);
   }
 
   getTemplate() {
@@ -198,15 +202,26 @@ export default class EditEvent {
     );
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _submitHandler(e) {
+    e.preventDefault();
+    this._callback.submit();
   }
 
-  removeElement() {
-    this._element = null;
+  _cancelHandler() {
+    this._callback.cancel();
+  }
+
+  setSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement()
+      .querySelector('form')
+      .addEventListener('submit', this._submitHandler);
+  }
+
+  setCancelHandler(callback) {
+    this._callback.cancel = callback;
+    this.getElement()
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this._cancelHandler);
   }
 }
