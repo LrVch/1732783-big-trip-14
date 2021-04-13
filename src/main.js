@@ -16,8 +16,8 @@ import {
   calculateFilterDisableState,
   calculateTotal,
   PlaceToInsert,
-  // eslint-disable-next-line comma-dangle
   render,
+  // eslint-disable-next-line comma-dangle
   replace,
 } from './utils';
 
