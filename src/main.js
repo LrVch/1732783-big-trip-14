@@ -18,6 +18,7 @@ import {
   PlaceToInsert,
   // eslint-disable-next-line comma-dangle
   render,
+  replace,
 } from './utils';
 
 const EVENTS_COUNT = 20;
@@ -38,25 +39,21 @@ const renderHeader = (events) => {
     new TripInfoView({
       cities: caclucateEventsCities(events),
       dates: caclucateEventsDates(events),
-    }).getElement(),
+    }),
     PlaceToInsert.BEFORE_END,
   );
 
   render(
     tripMainElement,
-    new TripCostView(calculateTotal(events)).getElement(),
+    new TripCostView(calculateTotal(events)),
     PlaceToInsert.BEFORE_END,
   );
 
-  render(
-    navigationElement,
-    new NavigationView().getElement(),
-    PlaceToInsert.BEFORE_END,
-  );
+  render(navigationElement, new NavigationView(), PlaceToInsert.BEFORE_END);
 
   render(
     filterElement,
-    new FilterView(calculateFilterDisableState(events)).getElement(),
+    new FilterView(calculateFilterDisableState(events)),
     PlaceToInsert.BEFORE_END,
   );
 };
@@ -71,17 +68,11 @@ const renderEvent = (eventsListElement, task) => {
   );
 
   const replaceEventToForm = () => {
-    eventsListElement.replaceChild(
-      editEventComponent.getElement(),
-      eventComponent.getElement(),
-    );
+    replace(editEventComponent, eventComponent);
   };
 
   const replaceFormToEvent = () => {
-    eventsListElement.replaceChild(
-      eventComponent.getElement(),
-      editEventComponent.getElement(),
-    );
+    replace(eventComponent, editEventComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -107,38 +98,26 @@ const renderEvent = (eventsListElement, task) => {
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  render(
-    eventsListElement,
-    eventComponent.getElement(),
-    PlaceToInsert.BEFORE_END,
-  );
+  render(eventsListElement, eventComponent, PlaceToInsert.BEFORE_END);
 };
 
 const renderEvents = (mainElement, tasks) => {
   if (!tasks.length) {
     return render(
       tripEventsElement,
-      new NoEventsView().getElement(),
+      new NoEventsView(),
       PlaceToInsert.BEFORE_END,
     );
   }
 
   const eventsListView = new EventsListView();
 
-  render(
-    tripEventsElement,
-    new SortView().getElement(),
-    PlaceToInsert.BEFORE_END,
-  );
+  render(tripEventsElement, new SortView(), PlaceToInsert.BEFORE_END);
 
-  render(
-    tripEventsElement,
-    eventsListView.getElement(),
-    PlaceToInsert.BEFORE_END,
-  );
+  render(tripEventsElement, eventsListView, PlaceToInsert.BEFORE_END);
 
   for (let i = 0; i < EVENTS_COUNT; i++) {
-    renderEvent(eventsListView.getElement(), events[i]);
+    renderEvent(eventsListView, events[i]);
   }
 };
 
