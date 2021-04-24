@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 import { EVENT_TYPES } from '../constants';
 import { getRandomInteger } from '../utils';
@@ -120,6 +121,7 @@ export const generateEvent = () => {
     eventOffers.slice(0, getRandomInteger(1, eventOffers.length - 1));
 
   return {
+    id: nanoid(),
     type,
     price: getRandomInteger(10, 500),
     isFavorite: Boolean(getRandomInteger(0, 1)),

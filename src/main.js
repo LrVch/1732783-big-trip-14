@@ -1,24 +1,18 @@
-import EditEventView from './view/edit-event';
-import EventView from './view/event';
-import EventsListView from './view/events-list';
 import FilterView from './view/filter';
 import NavigationView from './view/navigation';
-import SortView from './view/sort';
 import TripCostView from './view/trip-cost';
 import TripInfoView from './view/trip-info';
-import NoEventsView from './view/no-events';
+import TripPresenter from './presenter/trip';
 
-import { destinations, generateEvent, offers } from './mock/event';
-import { EVENT_TYPES } from './constants';
+import { generateEvent } from './mock/event';
 import {
   caclucateEventsCities,
   caclucateEventsDates,
   calculateFilterDisableState,
   calculateTotal,
   PlaceToInsert,
-  render,
   // eslint-disable-next-line comma-dangle
-  replace,
+  render,
 } from './utils';
 
 const EVENTS_COUNT = 20;
@@ -58,75 +52,8 @@ const renderHeader = (events) => {
   );
 };
 
-const renderEvent = (eventsListElement, task) => {
-  const eventComponent = new EventView(task);
-  const editEventComponent = new EditEventView(
-    EVENT_TYPES,
-    destinations,
-    offers,
-    task,
-  );
-
-  const replaceEventToForm = () => {
-    replace(editEventComponent, eventComponent);
-  };
-
-  const replaceFormToEvent = () => {
-    replace(eventComponent, editEventComponent);
-  };
-
-  /*
-    задача для Революция или эволюция? (часть 2) была сделана в ветке module3-task1, но так как
-    перейти к заданию 7. Разделяй и властвуй не возможно пока не сделана задача Революция или эволюция? (часть 2),
-    хотя написано что "Обратите внимание. Вторые части заданий можно отложить на потом и выполнить их в рамках подготовки к защите. А если чувствуете, что успеваете, можете выполнять их сразу."
-    то этот комментарий токлько для проформы чтоб можно было перейти к заданию 7. Разделяй и властвуй.
-   */
-  const onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      replaceFormToEvent();
-      document.removeEventListener('keydown', onEscKeyDown);
-    }
-  };
-
-  eventComponent.setEditClickHandler(() => {
-    replaceEventToForm();
-    document.addEventListener('keydown', onEscKeyDown);
-  });
-
-  editEventComponent.setSubmitHandler(() => {
-    replaceFormToEvent();
-    document.removeEventListener('keydown', onEscKeyDown);
-  });
-
-  editEventComponent.setCancelHandler(() => {
-    replaceFormToEvent();
-    document.removeEventListener('keydown', onEscKeyDown);
-  });
-
-  render(eventsListElement, eventComponent, PlaceToInsert.BEFORE_END);
-};
-
-const renderEvents = (mainElement, tasks) => {
-  if (!tasks.length) {
-    return render(
-      tripEventsElement,
-      new NoEventsView(),
-      PlaceToInsert.BEFORE_END,
-    );
-  }
-
-  const eventsListView = new EventsListView();
-
-  render(tripEventsElement, new SortView(), PlaceToInsert.BEFORE_END);
-
-  render(tripEventsElement, eventsListView, PlaceToInsert.BEFORE_END);
-
-  for (let i = 0; i < EVENTS_COUNT; i++) {
-    renderEvent(eventsListView, events[i]);
-  }
-};
-
 renderHeader(events);
 
-renderEvents(tripEventsElement, events);
+const tripPresenter = new TripPresenter(tripEventsElement);
+
+tripPresenter.init(events);

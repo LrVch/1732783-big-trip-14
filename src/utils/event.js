@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { formatToShortDay } from './format';
 
-export const calculateDuration = (startDate, endDate) => {
+export const calculateDuration = ({ startDate, endDate }) => {
   if (!startDate || !endDate) {
     return null;
   }
@@ -12,7 +12,7 @@ export const calculateDuration = (startDate, endDate) => {
 export const calculateEventPrice = ({ price = 0, offers = [] } = {}) =>
   offers.reduce((acc, next) => {
     return acc + next.price;
-  }, 0) + price;
+  }, price);
 
 export const calculateTotal = (events) => {
   return events.map(calculateEventPrice).reduce((acc, next) => acc + next, 0);
@@ -73,4 +73,37 @@ export const calculateFilterDisableState = (events) => {
     isFuture: events.some((event) => isEventInFuture(event.startDate)),
     isPast: events.some((event) => isEventInPast(event.endDate)),
   };
+};
+
+const getWeightForNullDate = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return 0;
+  }
+
+  if (dateA === null) {
+    return 1;
+  }
+
+  if (dateB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+export const sortByDuration = (a, b) => {
+  const weight = getWeightForNullDate(
+    calculateDuration(a),
+    calculateDuration(b),
+  );
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return calculateDuration(a) - calculateDuration(b);
+};
+
+export const sortByPrice = (a, b) => {
+  return calculateEventPrice(a) - calculateEventPrice(b);
 };

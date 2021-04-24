@@ -13,3 +13,9 @@ export const EVENT_TYPES = [
 
 export const ONE_HOUR = 60 * 60 * 1000;
 export const DAY = ONE_HOUR * 24;
+
+export const SortType = {
+  DEFAULT: 'default',
+  DURATION: 'diration',
+  PRICE: 'price',
+};
