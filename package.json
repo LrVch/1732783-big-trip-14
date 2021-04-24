@@ -24,6 +24,7 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "dayjs": "1.9.5"
+    "dayjs": "1.9.5",
+    "nanoid": "^3.1.22"
   }
 }

@@ -204,7 +204,7 @@ export default class EditEvent extends Abstract {
 
   _submitHandler(e) {
     e.preventDefault();
-    this._callback.submit();
+    this._callback.submit(this._event);
   }
 
   _cancelHandler() {

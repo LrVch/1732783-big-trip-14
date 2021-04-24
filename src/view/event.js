@@ -87,6 +87,7 @@ export default class Event extends Abstract {
     super();
     this._event = event;
     this._editClickHandler = this._editClickHandler.bind(this);
+    this._addToFavoriteHandler = this._addToFavoriteHandler.bind(this);
   }
 
   getTemplate() {
@@ -97,10 +98,21 @@ export default class Event extends Abstract {
     this._callback.editClick();
   }
 
+  _addToFavoriteHandler() {
+    this._callback.addToFavorite();
+  }
+
   setEditClickHandler(callback) {
     this._callback.editClick = callback;
     this.getElement()
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this._editClickHandler);
+  }
+
+  setAddToFavoriteHandler(callback) {
+    this._callback.addToFavorite = callback;
+    this.getElement()
+      .querySelector('.event__favorite-btn')
+      .addEventListener('click', this._addToFavoriteHandler);
   }
 }
