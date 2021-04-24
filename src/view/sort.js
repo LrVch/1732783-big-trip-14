@@ -1,9 +1,10 @@
 import Abstract from './abstarct';
+import { SortType } from '../constants';
 
 const createSortTemplate = () => {
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <div class="trip-sort__item  trip-sort__item--day">
-      <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked>
+      <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${SortType.DEFAULT}" checked>
       <label class="trip-sort__btn" for="sort-day">Day</label>
     </div>
 
@@ -13,12 +14,12 @@ const createSortTemplate = () => {
     </div>
 
     <div class="trip-sort__item  trip-sort__item--time">
-      <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
+      <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${SortType.DURATION}">
       <label class="trip-sort__btn" for="sort-time">Time</label>
     </div>
 
     <div class="trip-sort__item  trip-sort__item--price">
-      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
+      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${SortType.PRICE}">
       <label class="trip-sort__btn" for="sort-price">Price</label>
     </div>
 
@@ -32,9 +33,23 @@ const createSortTemplate = () => {
 export default class Sort extends Abstract {
   constructor() {
     super();
+
+    this._sortChangeHandler = this._sortChangeHandler.bind(this);
   }
 
   getTemplate() {
     return createSortTemplate();
+  }
+
+  _sortChangeHandler(event) {
+    this._callback.sortChange(event.target.value);
+  }
+
+  setSortChangeHandler(callback) {
+    this._callback.sortChange = callback;
+
+    Array.from(this.getElement()['trip-sort']).forEach((radio) => {
+      radio.addEventListener('click', this._sortChangeHandler);
+    });
   }
 }
