@@ -75,7 +75,7 @@ export default class Event {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._replaceFormToEvent();
+      this._ResetAndReplaceFormToEvent();
     }
   }
 
@@ -95,7 +95,7 @@ export default class Event {
   _onEscKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._replaceFormToEvent();
+      this._ResetAndReplaceFormToEvent();
     }
   }
 
@@ -108,7 +108,7 @@ export default class Event {
   }
 
   _handleCancel() {
-    this._replaceFormToEvent();
+    this._ResetAndReplaceFormToEvent();
   }
 
   _handleFavoriteClick() {
@@ -117,5 +117,10 @@ export default class Event {
         isFavorite: !this._event.isFavorite,
       }),
     );
+  }
+
+  _ResetAndReplaceFormToEvent() {
+    this._editEventComponent.reset(this._event);
+    this._replaceFormToEvent();
   }
 }
