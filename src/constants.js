@@ -19,3 +19,11 @@ export const SortType = {
   DURATION: 'diration',
   PRICE: 'price',
 };
+
+export const PICKER_OPTIONS = {
+  altInput: true,
+  enableTime: true,
+  dateFormat: 'd/m/y H:i',
+  altFormat: 'd/m/y H:i',
+  time_24hr: true,
+};

@@ -1,5 +1,8 @@
-import { formatToPickedDateTime } from '../utils';
 import Smart from './smart';
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import { PICKER_OPTIONS } from '../constants';
 
 const getDestinationTypeItem = (eventType) => (type) => {
   return `<div class="event__type-item">
@@ -141,11 +144,11 @@ export const createEditEventTemplate = (
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
           <input class="event__input  event__input--time event__input-start-date" id="event-start-time-1" type="text" name="event-start-time"
-            value="${formatToPickedDateTime(startDate)}">
+            value="${startDate}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
           <input class="event__input  event__input--time event__input-end-date" id="event-end-time-1" type="text" name="event-end-time"
-            value="${formatToPickedDateTime(endDate)}">
+            value="${endDate}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -180,6 +183,9 @@ export default class EditEvent extends Smart {
     this._destinations = destinations;
     this._offers = offers;
 
+    this._startDatePicker = null;
+    this._endDatePicker = null;
+
     this._submitHandler = this._submitHandler.bind(this);
     this._cancelHandler = this._cancelHandler.bind(this);
     this._priceChangeHandler = this._priceChangeHandler.bind(this);
@@ -190,26 +196,50 @@ export default class EditEvent extends Smart {
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepickers();
     this.setSubmitHandler(this._callback.submit);
     this.setCancelHandler(this._callback.cancel);
+  }
+
+  _setDatepickers() {
+    if (this._startDatePicker) {
+      this._startDatePicker.destroy();
+      this._startDatePicker = null;
+    }
+
+    if (this._endDatePicker) {
+      this._endDatePicker.destroy();
+      this._endDatePicker = null;
+    }
+
+    this._startDatePicker = flatpickr(
+      this.getElement().querySelector('.event__input-start-date'),
+      {
+        ...PICKER_OPTIONS,
+        defaultDate: this._data.startDate,
+        onChange: this._startDateChangeHandler,
+      },
+    );
+
+    this._endDatePicker = flatpickr(
+      this.getElement().querySelector('.event__input-end-date'),
+      {
+        ...PICKER_OPTIONS,
+        defaultDate: this._data.endDate,
+        onChange: this._endDateChangeHandler,
+      },
+    );
   }
 
   _setInnerHandlers() {
     this.getElement()
       .querySelector('.event__input--price')
       .addEventListener('input', this._priceChangeHandler);
-
-    this.getElement()
-      .querySelector('.event__input-start-date')
-      .addEventListener('input', this._startDateChangeHandler);
-
-    this.getElement()
-      .querySelector('.event__input-end-date')
-      .addEventListener('input', this._endDateChangeHandler);
 
     this.getElement()
       .querySelector('.event__input--destination')
@@ -258,21 +288,19 @@ export default class EditEvent extends Smart {
     );
   }
 
-  _startDateChangeHandler(event) {
-    event.preventDefault();
+  _startDateChangeHandler([userDate]) {
     this.updateData(
       {
-        startDate: event.target.value,
+        startDate: userDate,
       },
       true,
     );
   }
 
-  _endDateChangeHandler(event) {
-    event.preventDefault();
+  _endDateChangeHandler([userDate]) {
     this.updateData(
       {
-        endDate: event.target.value,
+        endDate: userDate,
       },
       true,
     );
