@@ -15,6 +15,10 @@ import {
   render,
 } from './utils';
 
+/*
+  этот пул реквест только для проформы, задание было выполнено в ветке module5-task1
+*/
+
 const EVENTS_COUNT = 20;
 
 const events = Array(EVENTS_COUNT).fill().map(generateEvent);
