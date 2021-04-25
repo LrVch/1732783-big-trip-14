@@ -219,20 +219,24 @@ export default class EditEvent extends Smart {
 
     this._startDatePicker = flatpickr(
       this.getElement().querySelector('.event__input-start-date'),
-      {
-        ...PICKER_OPTIONS,
-        defaultDate: this._data.startDate,
-        onChange: this._startDateChangeHandler,
-      },
+      Object.assign(
+        {
+          defaultDate: this._data.startDate,
+          onChange: this._startDateChangeHandler,
+        },
+        PICKER_OPTIONS,
+      ),
     );
 
     this._endDatePicker = flatpickr(
       this.getElement().querySelector('.event__input-end-date'),
-      {
-        ...PICKER_OPTIONS,
-        defaultDate: this._data.endDate,
-        onChange: this._endDateChangeHandler,
-      },
+      Object.assign(
+        {
+          defaultDate: this._data.startDate,
+          onChange: this._endDateChangeHandler,
+        },
+        PICKER_OPTIONS,
+      ),
     );
   }
 
@@ -327,10 +331,9 @@ export default class EditEvent extends Smart {
     event.preventDefault();
     this.updateData(
       {
-        offerIdsMap: {
-          ...this._data.offerIdsMap,
+        offerIdsMap: Object.assign({}, this._data.offerIdsMap, {
           [event.target.value]: event.target.checked,
-        },
+        }),
       },
       true,
     );
