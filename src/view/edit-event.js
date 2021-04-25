@@ -1,7 +1,7 @@
 import { formatToPickedDateTime } from '../utils';
-import Abstract from './abstarct';
+import Smart from './smart';
 
-const getDestinationItem = (eventType) => (type) => {
+const getDestinationTypeItem = (eventType) => (type) => {
   return `<div class="event__type-item">
     <input
       id="event-type-${type}"
@@ -94,29 +94,20 @@ export const createEditEventTemplate = (
   types = [],
   destinations = [],
   availableOffers = {},
-  event = {},
+  data = {},
 ) => {
   const {
     type = '',
     price = 0,
     startDate,
     endDate,
-    destination: { name } = {
-      name: '',
-    },
-    offerIds,
-  } = event;
+    currentDestination,
+    offerIdsMap,
+  } = data;
 
-  const currentDestination = destinations.find((elem) => elem.name === name);
+  const isEdit = Object.keys(data).length;
 
-  const isEdit = Object.keys(event).length;
-
-  const offerIdsMap = offerIds.reduce((acc, id) => {
-    return {
-      ...acc,
-      [id]: true,
-    };
-  }, {});
+  const destinationName = currentDestination ? currentDestination.name : '';
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -131,7 +122,7 @@ export const createEditEventTemplate = (
           <div class="event__type-list">
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Event type</legend>
-              ${types.map(getDestinationItem(type)).join(' ')}
+              ${types.map(getDestinationTypeItem(type)).join(' ')}
             </fieldset>
           </div>
         </div>
@@ -141,7 +132,7 @@ export const createEditEventTemplate = (
             ${type}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-            value="${name}" list="destination-list-1">
+            value="${destinationName}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${getDestinationOptions(destinations)}
           </datalist>
@@ -149,11 +140,11 @@ export const createEditEventTemplate = (
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
+          <input class="event__input  event__input--time event__input-start-date" id="event-start-time-1" type="text" name="event-start-time"
             value="${formatToPickedDateTime(startDate)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
+          <input class="event__input  event__input--time event__input-end-date" id="event-end-time-1" type="text" name="event-end-time"
             value="${formatToPickedDateTime(endDate)}">
         </div>
 
@@ -181,16 +172,60 @@ export const createEditEventTemplate = (
   </li>`;
 };
 
-export default class EditEvent extends Abstract {
+export default class EditEvent extends Smart {
   constructor(eventTypes, destinations, offers, event) {
     super();
-    this._event = event;
+    this._data = EditEvent.parseEventToData(event, destinations);
     this._eventTypes = eventTypes;
     this._destinations = destinations;
     this._offers = offers;
 
     this._submitHandler = this._submitHandler.bind(this);
     this._cancelHandler = this._cancelHandler.bind(this);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSubmitHandler(this._callback.submit);
+    this.setCancelHandler(this._callback.cancel);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('input', this._priceChangeHandler);
+
+    this.getElement()
+      .querySelector('.event__input-start-date')
+      .addEventListener('input', this._startDateChangeHandler);
+
+    this.getElement()
+      .querySelector('.event__input-end-date')
+      .addEventListener('input', this._endDateChangeHandler);
+
+    this.getElement()
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this._destinationChangeHandler);
+
+    Array.from(
+      this.getElement().querySelectorAll('[name="event-type"]'),
+    ).forEach((radio) =>
+      radio.addEventListener('change', this._eventTypeChangeHandler),
+    );
+
+    Array.from(
+      this.getElement().querySelectorAll('.event__offer-checkbox'),
+    ).forEach((checkbox) =>
+      checkbox.addEventListener('change', this._offersChangeHandler),
+    );
   }
 
   getTemplate() {
@@ -198,17 +233,79 @@ export default class EditEvent extends Abstract {
       this._eventTypes,
       this._destinations,
       this._offers,
-      this._event,
+      this._data,
     );
   }
 
   _submitHandler(e) {
     e.preventDefault();
-    this._callback.submit(this._event);
+    this._callback.submit(
+      EditEvent.parseDataToEvent(this._data, this._offers, this._destinations),
+    );
   }
 
   _cancelHandler() {
     this._callback.cancel();
+  }
+
+  _priceChangeHandler(event) {
+    event.preventDefault();
+    this.updateData(
+      {
+        price: event.target.value,
+      },
+      true,
+    );
+  }
+
+  _startDateChangeHandler(event) {
+    event.preventDefault();
+    this.updateData(
+      {
+        startDate: event.target.value,
+      },
+      true,
+    );
+  }
+
+  _endDateChangeHandler(event) {
+    event.preventDefault();
+    this.updateData(
+      {
+        endDate: event.target.value,
+      },
+      true,
+    );
+  }
+
+  _destinationChangeHandler(event) {
+    event.preventDefault();
+    this.updateData({
+      currentDestination: this._destinations.find(
+        (elem) => elem.name === event.target.value,
+      ),
+    });
+  }
+
+  _eventTypeChangeHandler(event) {
+    event.preventDefault();
+    this.updateData({
+      type: event.target.value,
+      offerIdsMap: {},
+    });
+  }
+
+  _offersChangeHandler(event) {
+    event.preventDefault();
+    this.updateData(
+      {
+        offerIdsMap: {
+          ...this._data.offerIdsMap,
+          [event.target.value]: event.target.checked,
+        },
+      },
+      true,
+    );
   }
 
   setSubmitHandler(callback) {
@@ -223,5 +320,55 @@ export default class EditEvent extends Abstract {
     this.getElement()
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this._cancelHandler);
+  }
+
+  reset(event) {
+    this.updateData(EditEvent.parseEventToData(event, this._destinations));
+  }
+
+  static parseEventToData(
+    { id, type, price, isFavorite, startDate, endDate, destination, offerIds },
+    destinations,
+  ) {
+    return Object.assign(
+      {},
+      {
+        id,
+        type,
+        price,
+        isFavorite,
+        startDate,
+        endDate,
+        offerIdsMap: offerIds.reduce((acc, id) => {
+          return {
+            ...acc,
+            [id]: true,
+          };
+        }, {}),
+        currentDestination: destinations.find(
+          (elem) => elem.name === destination.name,
+        ),
+      },
+    );
+  }
+
+  static parseDataToEvent(data, availableOffers, destinations) {
+    data = Object.assign({}, data);
+
+    data.offerIds = Object.keys(data.offerIdsMap).filter(
+      (key) => data.offerIdsMap[key],
+    );
+    data.offers = (availableOffers[data.type] || []).filter(
+      (offer) => data.offerIdsMap[offer.id],
+    );
+
+    data.destination = destinations.find(
+      (elem) => elem.name === data.currentDestination.name,
+    );
+
+    delete data.currentDestination;
+    delete data.offerIdsMap;
+
+    return data;
   }
 }
