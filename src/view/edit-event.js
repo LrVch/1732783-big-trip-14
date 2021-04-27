@@ -1,6 +1,10 @@
 import Smart from './smart';
 import flatpickr from 'flatpickr';
 
+/*
+  этот комент для проформы, задание Обновление века (часть 2) было выполнено в ветке module6-task1
+*/
+
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import { PICKER_OPTIONS } from '../constants';
 
