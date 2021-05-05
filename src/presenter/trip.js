@@ -5,7 +5,6 @@ import {
   PlaceToInsert,
   render,
   sortByDuration,
-  updateItem,
   // eslint-disable-next-line comma-dangle
   sortByPrice,
 } from '../utils';
@@ -13,7 +12,8 @@ import EventPresenter from '../presenter/event';
 import { SortType } from '../constants';
 
 export default class Trip {
-  constructor(tripContainer) {
+  constructor(tripContainer, eventsModel) {
+    this._eventsModel = eventsModel;
     this._tripContainer = tripContainer;
     this._eventPresenter = {};
     this._currentSortType = SortType.DEFAULT;
@@ -22,20 +22,33 @@ export default class Trip {
     this._noEventsComponent = new NoEventsView();
     this._sortComponent = new SortView();
 
-    this._handleEventChange = this._handleEventChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortChange = this._handleSortChange.bind(this);
+
+    this._eventsModel.addObserver(this._handleModelEvent);
   }
 
-  init(events) {
-    this._events = events.slice();
-    this._sourcedEvents = events.slice();
+  _getEvents() {
+    switch (this._currentSortType) {
+      case SortType.DURATION:
+        return this._eventsModel.getEvents().slice().sort(sortByDuration);
+      case SortType.PRICE:
+        return this._eventsModel.getEvents().slice().sort(sortByPrice);
+    }
 
+    return this._eventsModel.getEvents();
+  }
+
+  init() {
     this._renderTrip();
   }
 
   _renderTrip() {
-    if (!this._events.length) {
+    const events = this._getEvents();
+
+    if (!events.length) {
       return this._renderNoEvents();
     }
 
@@ -43,7 +56,7 @@ export default class Trip {
 
     this._renderEventsContainer();
 
-    this._renderEvents();
+    this._renderEvents(events);
   }
 
   _renderEventsContainer() {
@@ -62,7 +75,7 @@ export default class Trip {
   _renderEvent(event) {
     const eventPresenter = new EventPresenter(
       this._eventsListComponent,
-      this._handleEventChange,
+      this._handleViewAction,
       this._handleModeChange,
     );
     eventPresenter.init(event);
@@ -77,8 +90,8 @@ export default class Trip {
     );
   }
 
-  _renderEvents() {
-    this._events.forEach((event) => this._renderEvent(event));
+  _renderEvents(events) {
+    events.forEach((event) => this._renderEvent(event));
   }
 
   _clearEventsList() {
@@ -88,9 +101,16 @@ export default class Trip {
     this._eventPresenter = {};
   }
 
-  _handleEventChange(updatedEvent) {
-    this._events = updateItem(this._events, updatedEvent);
-    this._eventPresenter[updatedEvent.id].init(updatedEvent);
+  // _handleEventChange(updatedEvent) {
+  //   this._eventPresenter[updatedEvent.id].init(updatedEvent);
+  // }
+
+  _handleViewAction(actionType, updateType, update) {
+    console.log(actionType, updateType, update);
+  }
+
+  _handleModelEvent(updateType, data) {
+    console.log(updateType, data);
   }
 
   _handleModeChange() {
@@ -99,28 +119,13 @@ export default class Trip {
     );
   }
 
-  _sortEvents(sortType) {
-    switch (sortType) {
-      case SortType.DURATION:
-        this._events.sort(sortByDuration);
-        break;
-      case SortType.PRICE:
-        this._events.sort(sortByPrice);
-        break;
-      default:
-        this._events = this._sourcedEvents.slice();
-    }
-
-    this._currentSortType = sortType;
-  }
-
   _handleSortChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
 
-    this._sortEvents(sortType);
+    this._currentSortType = sortType;
     this._clearEventsList();
-    this._renderEvents();
+    this._renderEvents(this._getEvents());
   }
 }

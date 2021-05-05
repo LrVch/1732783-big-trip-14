@@ -3,6 +3,7 @@ import { destinations, offers } from '../mock/event';
 import EventView from '../view/event';
 import EditEventView from '../view/edit-event';
 import { PlaceToInsert, remove, render, replace } from '../utils';
+import { UserAction, UpdateType } from '../constants';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -22,6 +23,7 @@ export default class Event {
     this._handleCancel = this._handleCancel.bind(this);
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
+    this._handleDelete = this._handleDelete.bind(this);
     this._onEscKeyDownHandler = this._onEscKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
@@ -47,6 +49,8 @@ export default class Event {
     this._editEventComponent.setSubmitHandler(this._handleSubmit);
 
     this._editEventComponent.setCancelHandler(this._handleCancel);
+
+    this._editEventComponent.setDeleteHandler(this._handleDelete);
 
     if (prevEventComponent === null || prevEditEventComponent === null) {
       return render(
@@ -75,7 +79,7 @@ export default class Event {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._ResetAndReplaceFormToEvent();
+      this._resetAndReplaceFormToEvent();
     }
   }
 
@@ -95,7 +99,7 @@ export default class Event {
   _onEscKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._ResetAndReplaceFormToEvent();
+      this._resetAndReplaceFormToEvent();
     }
   }
 
@@ -103,23 +107,39 @@ export default class Event {
     this._replaceEventToForm();
   }
 
-  _handleSubmit() {
+  _handleSubmit(event) {
     this._replaceFormToEvent();
+    this._handleEventChange(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      Object.assign({}, event),
+    );
+  }
+
+  _handleDelete(event) {
+    this._replaceFormToEvent();
+    this._handleEventChange(
+      UserAction.DELETE_TASK,
+      UpdateType.MINOR,
+      Object.assign({}, event),
+    );
   }
 
   _handleCancel() {
-    this._ResetAndReplaceFormToEvent();
+    this._resetAndReplaceFormToEvent();
   }
 
   _handleFavoriteClick() {
     this._handleEventChange(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
       Object.assign({}, this._event, {
         isFavorite: !this._event.isFavorite,
       }),
     );
   }
 
-  _ResetAndReplaceFormToEvent() {
+  _resetAndReplaceFormToEvent() {
     this._editEventComponent.reset(this._event);
     this._replaceFormToEvent();
   }

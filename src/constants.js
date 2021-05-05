@@ -27,3 +27,15 @@ export const PICKER_OPTIONS = {
   altFormat: 'd/m/y H:i',
   time_24hr: true,
 };
+
+export const UserAction = {
+  UPDATE_TASK: 'UPDATE_TASK',
+  ADD_TASK: 'ADD_TASK',
+  DELETE_TASK: 'DELETE_TASK',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};

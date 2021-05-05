@@ -1,10 +1,6 @@
 import Smart from './smart';
 import flatpickr from 'flatpickr';
 
-/*
-  этот комент для проформы, задание Обновление века (часть 2) было выполнено в ветке module6-task1
-*/
-
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import { PICKER_OPTIONS } from '../constants';
 
@@ -110,9 +106,10 @@ export const createEditEventTemplate = (
     endDate,
     currentDestination,
     offerIdsMap,
+    id,
   } = data;
 
-  const isEdit = Object.keys(data).length;
+  const isEdit = !!id;
 
   const destinationName = currentDestination ? currentDestination.name : '';
 
@@ -164,7 +161,7 @@ export const createEditEventTemplate = (
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">
+        <button class="event__reset-btn" type=${isEdit ? 'button' : 'reset'}>
           ${isEdit ? 'Delete' : 'Canel'}
         </button>
         ${getEventCloseButton(isEdit)}
@@ -192,6 +189,7 @@ export default class EditEvent extends Smart {
 
     this._submitHandler = this._submitHandler.bind(this);
     this._cancelHandler = this._cancelHandler.bind(this);
+    this._deleteHandler = this._deleteHandler.bind(this);
     this._priceChangeHandler = this._priceChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
@@ -208,6 +206,7 @@ export default class EditEvent extends Smart {
     this._setDatepickers();
     this.setSubmitHandler(this._callback.submit);
     this.setCancelHandler(this._callback.cancel);
+    this.setDeleteHandler(this._callback.delete);
   }
 
   _setDatepickers() {
@@ -278,6 +277,13 @@ export default class EditEvent extends Smart {
   _submitHandler(e) {
     e.preventDefault();
     this._callback.submit(
+      EditEvent.parseDataToEvent(this._data, this._offers, this._destinations),
+    );
+  }
+
+  _deleteHandler(e) {
+    e.preventDefault();
+    this._callback.delete(
       EditEvent.parseDataToEvent(this._data, this._offers, this._destinations),
     );
   }
@@ -355,6 +361,13 @@ export default class EditEvent extends Smart {
     this.getElement()
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this._cancelHandler);
+  }
+
+  setDeleteHandler(callback) {
+    this._callback.delete = callback;
+    this.getElement()
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this._deleteHandler);
   }
 
   reset(event) {

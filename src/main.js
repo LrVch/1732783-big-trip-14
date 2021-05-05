@@ -3,6 +3,7 @@ import NavigationView from './view/navigation';
 import TripCostView from './view/trip-cost';
 import TripInfoView from './view/trip-info';
 import TripPresenter from './presenter/trip';
+import EventsModel from './model/events';
 
 import { generateEvent } from './mock/event';
 import {
@@ -15,13 +16,12 @@ import {
   render,
 } from './utils';
 
-/*
-  этот пул реквест только для проформы, задание было выполнено в ветке module5-task1
-*/
-
 const EVENTS_COUNT = 20;
 
 const events = Array(EVENTS_COUNT).fill().map(generateEvent);
+
+const eventsModel = new EventsModel();
+eventsModel.setEvents(events);
 
 const mainElement = document.querySelector('.page-body');
 const tripMainElement = mainElement.querySelector('.trip-info');
@@ -58,6 +58,6 @@ const renderHeader = (events) => {
 
 renderHeader(events);
 
-const tripPresenter = new TripPresenter(tripEventsElement);
+const tripPresenter = new TripPresenter(tripEventsElement, eventsModel);
 
-tripPresenter.init(events);
+tripPresenter.init();
