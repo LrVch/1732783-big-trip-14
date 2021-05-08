@@ -235,7 +235,7 @@ export default class EditEvent extends Smart {
       this.getElement().querySelector('.event__input-end-date'),
       Object.assign(
         {
-          defaultDate: this._data.startDate,
+          defaultDate: this._data.endDate,
           onChange: this._endDateChangeHandler,
         },
         PICKER_OPTIONS,
@@ -372,6 +372,20 @@ export default class EditEvent extends Smart {
 
   reset(event) {
     this.updateData(EditEvent.parseEventToData(event, this._destinations));
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatePicker) {
+      this._startDatePicker.destroy();
+      this._startDatePicker = null;
+    }
+
+    if (this._endDatePicker) {
+      this._endDatePicker.destroy();
+      this._endDatePicker = null;
+    }
   }
 
   static parseEventToData(

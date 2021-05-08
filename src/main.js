@@ -1,16 +1,12 @@
-import FilterView from './view/filter';
 import NavigationView from './view/navigation';
-import TripCostView from './view/trip-cost';
-import TripInfoView from './view/trip-info';
 import TripPresenter from './presenter/trip';
+import FilterPresenter from './presenter/filter';
+import TripInfoPresenter from './presenter/tripInfo';
 import EventsModel from './model/events';
+import FilterModel from './model/fiter';
 
 import { generateEvent } from './mock/event';
 import {
-  caclucateEventsCities,
-  caclucateEventsDates,
-  calculateFilterDisableState,
-  calculateTotal,
   PlaceToInsert,
   // eslint-disable-next-line comma-dangle
   render,
@@ -23,6 +19,8 @@ const events = Array(EVENTS_COUNT).fill().map(generateEvent);
 const eventsModel = new EventsModel();
 eventsModel.setEvents(events);
 
+const filterModel = new FilterModel();
+
 const mainElement = document.querySelector('.page-body');
 const tripMainElement = mainElement.querySelector('.trip-info');
 const navigationElement = mainElement.querySelector(
@@ -31,33 +29,21 @@ const navigationElement = mainElement.querySelector(
 const filterElement = mainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = mainElement.querySelector('.trip-events');
 
-const renderHeader = (events) => {
-  render(
-    tripMainElement,
-    new TripInfoView({
-      cities: caclucateEventsCities(events),
-      dates: caclucateEventsDates(events),
-    }),
-    PlaceToInsert.BEFORE_END,
-  );
+render(navigationElement, new NavigationView(), PlaceToInsert.BEFORE_END);
 
-  render(
-    tripMainElement,
-    new TripCostView(calculateTotal(events)),
-    PlaceToInsert.BEFORE_END,
-  );
+const tripPresenter = new TripPresenter(
+  tripEventsElement,
+  eventsModel,
+  filterModel,
+);
+const filterPresenter = new FilterPresenter(
+  filterElement,
+  filterModel,
+  eventsModel,
+);
 
-  render(navigationElement, new NavigationView(), PlaceToInsert.BEFORE_END);
+const tripInfoPresenter = new TripInfoPresenter(tripMainElement, eventsModel);
 
-  render(
-    filterElement,
-    new FilterView(calculateFilterDisableState(events)),
-    PlaceToInsert.BEFORE_END,
-  );
-};
-
-renderHeader(events);
-
-const tripPresenter = new TripPresenter(tripEventsElement, eventsModel);
-
+tripInfoPresenter.init();
+filterPresenter.init();
 tripPresenter.init();

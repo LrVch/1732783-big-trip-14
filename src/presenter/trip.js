@@ -3,24 +3,27 @@ import NoEventsView from '../view/no-events';
 import SortView from '../view/sort';
 import {
   PlaceToInsert,
+  remove,
   render,
   sortByDuration,
   // eslint-disable-next-line comma-dangle
   sortByPrice,
 } from '../utils';
 import EventPresenter from '../presenter/event';
-import { SortType } from '../constants';
+import { SortType, UserAction, UpdateType } from '../constants';
+import { filter } from '../utils/filter';
 
 export default class Trip {
-  constructor(tripContainer, eventsModel) {
+  constructor(tripContainer, eventsModel, filterModel) {
     this._eventsModel = eventsModel;
+    this._filterModel = filterModel;
     this._tripContainer = tripContainer;
     this._eventPresenter = {};
     this._currentSortType = SortType.DEFAULT;
 
     this._eventsListComponent = new EventsListView();
     this._noEventsComponent = new NoEventsView();
-    this._sortComponent = new SortView();
+    this._sortComponent = null;
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -28,17 +31,22 @@ export default class Trip {
     this._handleSortChange = this._handleSortChange.bind(this);
 
     this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   _getEvents() {
+    const filterType = this._filterModel.getFilter();
+    const events = this._eventsModel.getEvents();
+    const filtredEvents = filter[filterType](events);
+
     switch (this._currentSortType) {
       case SortType.DURATION:
-        return this._eventsModel.getEvents().slice().sort(sortByDuration);
+        return filtredEvents.slice().sort(sortByDuration);
       case SortType.PRICE:
-        return this._eventsModel.getEvents().slice().sort(sortByPrice);
+        return filtredEvents.slice().sort(sortByPrice);
     }
 
-    return this._eventsModel.getEvents();
+    return filtredEvents;
   }
 
   init() {
@@ -68,8 +76,14 @@ export default class Trip {
   }
 
   _renderSort() {
-    render(this._tripContainer, this._sortComponent, PlaceToInsert.BEFORE_END);
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortChangeHandler(this._handleSortChange);
+
+    render(this._tripContainer, this._sortComponent, PlaceToInsert.BEFORE_END);
   }
 
   _renderEvent(event) {
@@ -94,23 +108,34 @@ export default class Trip {
     events.forEach((event) => this._renderEvent(event));
   }
 
-  _clearEventsList() {
-    Object.values(this._eventPresenter).forEach((presenter) =>
-      presenter.destroy(),
-    );
-    this._eventPresenter = {};
-  }
-
-  // _handleEventChange(updatedEvent) {
-  //   this._eventPresenter[updatedEvent.id].init(updatedEvent);
-  // }
-
   _handleViewAction(actionType, updateType, update) {
-    console.log(actionType, updateType, update);
+    switch (actionType) {
+      case UserAction.UPDATE_TASK:
+        this._eventsModel.updateEvent(updateType, update);
+        break;
+      case UserAction.ADD_TASK:
+        this._eventsModel.addEvent(updateType, update);
+        break;
+      case UserAction.DELETE_TASK:
+        this._eventsModel.deleteEvent(updateType, update);
+        break;
+    }
   }
 
   _handleModelEvent(updateType, data) {
-    console.log(updateType, data);
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._eventPresenter[data.id].init(data);
+        break;
+      case UpdateType.MINOR:
+        this._clearBoard();
+        this._renderTrip();
+        break;
+      case UpdateType.MAJOR:
+        this._clearBoard({ resetSortType: true });
+        this._renderTrip();
+        break;
+    }
   }
 
   _handleModeChange() {
@@ -125,7 +150,21 @@ export default class Trip {
     }
 
     this._currentSortType = sortType;
-    this._clearEventsList();
-    this._renderEvents(this._getEvents());
+    this._clearBoard();
+    this._renderTrip();
+  }
+
+  _clearBoard({ resetSortType = false } = {}) {
+    Object.values(this._eventPresenter).forEach((presenter) =>
+      presenter.destroy(),
+    );
+    this._eventPresenter = {};
+
+    remove(this._sortComponent);
+    remove(this._noEventsComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
+    }
   }
 }

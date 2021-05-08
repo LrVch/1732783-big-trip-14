@@ -2,7 +2,7 @@ import { EVENT_TYPES } from '../constants';
 import { destinations, offers } from '../mock/event';
 import EventView from '../view/event';
 import EditEventView from '../view/edit-event';
-import { PlaceToInsert, remove, render, replace } from '../utils';
+import { isDatesEqual, PlaceToInsert, remove, render, replace } from '../utils';
 import { UserAction, UpdateType } from '../constants';
 
 const Mode = {
@@ -108,12 +108,17 @@ export default class Event {
   }
 
   _handleSubmit(event) {
-    this._replaceFormToEvent();
+    const isMinorUpdate =
+      !isDatesEqual(this._event.startDate, event.startDate) ||
+      !isDatesEqual(this._event.endDate, event.endDate);
+
     this._handleEventChange(
       UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       Object.assign({}, event),
     );
+
+    this._replaceFormToEvent();
   }
 
   _handleDelete(event) {
@@ -132,7 +137,7 @@ export default class Event {
   _handleFavoriteClick() {
     this._handleEventChange(
       UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       Object.assign({}, this._event, {
         isFavorite: !this._event.isFavorite,
       }),
