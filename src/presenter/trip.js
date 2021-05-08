@@ -6,11 +6,13 @@ import {
   remove,
   render,
   sortByDuration,
-  // eslint-disable-next-line comma-dangle
   sortByPrice,
+  // eslint-disable-next-line comma-dangle
+  sortFromStartToEnd,
 } from '../utils';
 import EventPresenter from '../presenter/event';
-import { SortType, UserAction, UpdateType } from '../constants';
+import EventNewPresenter from '../presenter/event-new';
+import { SortType, UserAction, UpdateType, FilterType } from '../constants';
 import { filter } from '../utils/filter';
 
 export default class Trip {
@@ -32,6 +34,11 @@ export default class Trip {
 
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._eventNewPresenter = new EventNewPresenter(
+      this._eventsListComponent,
+      this._handleViewAction,
+    );
   }
 
   _getEvents() {
@@ -46,11 +53,17 @@ export default class Trip {
         return filtredEvents.slice().sort(sortByPrice);
     }
 
-    return filtredEvents;
+    return filtredEvents.slice().sort(sortFromStartToEnd);
   }
 
   init() {
     this._renderTrip();
+  }
+
+  createEvent() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._eventNewPresenter.init();
   }
 
   _renderTrip() {
@@ -139,6 +152,7 @@ export default class Trip {
   }
 
   _handleModeChange() {
+    this._eventNewPresenter.destroy();
     Object.values(this._eventPresenter).forEach((presenter) =>
       presenter.resetView(),
     );
@@ -155,6 +169,7 @@ export default class Trip {
   }
 
   _clearBoard({ resetSortType = false } = {}) {
+    this._eventNewPresenter.destroy();
     Object.values(this._eventPresenter).forEach((presenter) =>
       presenter.destroy(),
     );

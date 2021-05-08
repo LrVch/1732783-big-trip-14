@@ -7,3 +7,11 @@ export const getRandomInteger = (a = 0, b = 1) => {
 
 export const changeFirstLetteToUpperCase = (str) =>
   str.length ? str[0].toUpperCase() + str.slice(1) : '';
+
+export const requiredValidator = (value) => {
+  if (!value) {
+    return false;
+  }
+
+  return true;
+};
