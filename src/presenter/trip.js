@@ -12,7 +12,7 @@ import {
 } from '../utils';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from '../presenter/event-new';
-import { SortType, UserAction, UpdateType, FilterType } from '../constants';
+import { SortType, UserAction, UpdateType } from '../constants';
 import { filter } from '../utils/filter';
 
 export default class Trip {
@@ -31,9 +31,6 @@ export default class Trip {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortChange = this._handleSortChange.bind(this);
-
-    this._eventsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
 
     this._eventNewPresenter = new EventNewPresenter(
       this._eventsListComponent,
@@ -57,13 +54,32 @@ export default class Trip {
   }
 
   init() {
+    this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
+    this._renderEventsContainer();
     this._renderTrip();
   }
 
-  createEvent() {
-    this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._eventNewPresenter.init();
+  destroy() {
+    this._clearBoard({ resetSortType: true });
+
+    remove(this._eventsListComponent);
+
+    this._eventsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createEvent(callback) {
+    this._eventNewPresenter.init(callback);
+  }
+
+  disableSort() {
+    this._sortComponent.disable();
+  }
+
+  enableSort() {
+    this._sortComponent.enable();
   }
 
   _renderTrip() {
@@ -74,8 +90,6 @@ export default class Trip {
     }
 
     this._renderSort();
-
-    this._renderEventsContainer();
 
     this._renderEvents(events);
   }
@@ -96,7 +110,7 @@ export default class Trip {
     this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortChangeHandler(this._handleSortChange);
 
-    render(this._tripContainer, this._sortComponent, PlaceToInsert.BEFORE_END);
+    render(this._tripContainer, this._sortComponent, PlaceToInsert.AFTER_BEGIN);
   }
 
   _renderEvent(event) {

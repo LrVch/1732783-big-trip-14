@@ -1,7 +1,11 @@
 import { FilterType } from '../constants';
 import Abstract from './abstarct';
 
-const createFilterTemplate = ({ isFuture, isPast } = {}, currentFilterType) => {
+const createFilterTemplate = (
+  { isFuture, isPast } = {},
+  currentFilterType,
+  disabled,
+) => {
   return `<form class="trip-filters" action="#" method="get">
     <div class="trip-filters__filter">
       <input
@@ -10,6 +14,7 @@ const createFilterTemplate = ({ isFuture, isPast } = {}, currentFilterType) => {
         type="radio"
         name="trip-filter"
         value="everything"
+        ${disabled ? 'disabled' : ''}
         ${FilterType.EVERYTHING === currentFilterType ? 'checked' : ''}>
       <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
     </div>
@@ -21,7 +26,7 @@ const createFilterTemplate = ({ isFuture, isPast } = {}, currentFilterType) => {
       type="radio"
       name="trip-filter"
       value="future"
-      ${isFuture ? '' : 'disabled'}
+      ${disabled || !isFuture ? 'disabled' : ''}
       ${FilterType.FUTURE === currentFilterType ? 'checked' : ''}
       >
       <label class="trip-filters__filter-label" for="filter-future">Future</label>
@@ -34,7 +39,7 @@ const createFilterTemplate = ({ isFuture, isPast } = {}, currentFilterType) => {
       type="radio"
       name="trip-filter"
       value="past"
-      ${isPast ? '' : 'disabled'}
+      ${disabled || !isPast ? 'disabled' : ''}
       ${FilterType.PAST === currentFilterType ? 'checked' : ''}
       >
       <label class="trip-filters__filter-label" for="filter-past">Past</label>
@@ -45,16 +50,21 @@ const createFilterTemplate = ({ isFuture, isPast } = {}, currentFilterType) => {
 };
 
 export default class Filter extends Abstract {
-  constructor(filterState = {}, currentFilterType) {
+  constructor(filterState = {}, currentFilterType, disabled) {
     super();
     this._filterState = filterState;
     this._currentFilterType = currentFilterType;
+    this._disabled = disabled;
 
     this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createFilterTemplate(this._filterState, this._currentFilterType);
+    return createFilterTemplate(
+      this._filterState,
+      this._currentFilterType,
+      this._disabled,
+    );
   }
 
   _filterTypeChangeHandler(event) {
@@ -65,6 +75,18 @@ export default class Filter extends Abstract {
     this._callback.filterTypeChange = callback;
     Array.from(this.getElement()['trip-filter']).forEach((radio) => {
       radio.addEventListener('click', this._filterTypeChangeHandler);
+    });
+  }
+
+  enable() {
+    Array.from(this.getElement()['trip-filter']).forEach((radio) => {
+      radio.removeAttribute('disabled');
+    });
+  }
+
+  disable() {
+    Array.from(this.getElement()['trip-filter']).forEach((radio) => {
+      radio.setAttribute('disabled', true);
     });
   }
 }

@@ -45,3 +45,9 @@ export const FilterType = {
   FUTURE: 'future',
   PAST: 'past',
 };
+
+export const NavigationItems = {
+  ADD_NEW_EVENT: 'ADD_NEW_EVENT',
+  TABLE: 'TABLE',
+  STATS: 'STATS',
+};

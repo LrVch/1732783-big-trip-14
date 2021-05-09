@@ -10,6 +10,7 @@ export default class Filter {
     this._eventsModel = eventsModel;
 
     this._filterComponent = null;
+    this._disabled = false;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
@@ -25,6 +26,7 @@ export default class Filter {
     this._filterComponent = new FilterView(
       calculateFilterDisableState(events),
       this._filterModel.getFilter(),
+      this._disabled,
     );
     this._filterComponent.setFilterTypeChangeHandler(
       this._handleFilterTypeChange,
@@ -51,7 +53,16 @@ export default class Filter {
     if (this._filterModel.getFilter() === filterType) {
       return;
     }
-
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+  }
+
+  disable() {
+    this._disabled = true;
+    this._filterComponent.disable();
+  }
+
+  enable() {
+    this._disabled = false;
+    this._filterComponent.enable();
   }
 }

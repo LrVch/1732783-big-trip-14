@@ -12,13 +12,16 @@ export default class EventNew {
     this._handleEventChange = handleEventChange;
 
     this._editEventComponent = null;
+    this._destroyCallback = null;
 
     this._handleDelete = this._handleDelete.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._onEscKeyDownHandler = this._onEscKeyDownHandler.bind(this);
   }
 
-  init() {
+  init(callback) {
+    this._destroyCallback = callback;
+
     if (this._editEventComponent !== null) {
       return;
     }
@@ -39,9 +42,6 @@ export default class EventNew {
     );
 
     document.addEventListener('keydown', this._onEscKeyDownHandler);
-    document
-      .querySelector('.trip-main__event-add-btn')
-      .setAttribute('disabled', true);
   }
 
   destroy() {
@@ -49,13 +49,14 @@ export default class EventNew {
       return;
     }
 
+    if (this._destroyCallback !== null) {
+      this._destroyCallback();
+    }
+
     remove(this._editEventComponent);
     this._editEventComponent = null;
 
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
-    document
-      .querySelector('.trip-main__event-add-btn')
-      .removeAttribute('disabled');
   }
 
   _onEscKeyDownHandler(evt) {

@@ -83,4 +83,16 @@ export default class Sort extends Abstract {
       radio.addEventListener('click', this._sortChangeHandler);
     });
   }
+
+  enable() {
+    Array.from(this.getElement()['trip-sort']).forEach((radio) => {
+      radio.removeAttribute('disabled');
+    });
+  }
+
+  disable() {
+    Array.from(this.getElement()['trip-sort']).forEach((radio) => {
+      radio.setAttribute('disabled', true);
+    });
+  }
 }

@@ -55,7 +55,7 @@ const createEventTemplate = (event = {}) => {
           ">${formatToTime(endDate)}</time>
         </p>
         <p class="event__duration">
-          ${formatToDuration(calculateDuration(startDate, endDate))}
+          ${formatToDuration(calculateDuration({ startDate, endDate }))}
         </p>
       </div>
       <p class="event__price">
