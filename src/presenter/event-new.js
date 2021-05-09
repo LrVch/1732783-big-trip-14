@@ -39,6 +39,9 @@ export default class EventNew {
     );
 
     document.addEventListener('keydown', this._onEscKeyDownHandler);
+    document
+      .querySelector('.trip-main__event-add-btn')
+      .setAttribute('disabled', true);
   }
 
   destroy() {
@@ -50,12 +53,15 @@ export default class EventNew {
     this._editEventComponent = null;
 
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
+    document
+      .querySelector('.trip-main__event-add-btn')
+      .removeAttribute('disabled');
   }
 
   _onEscKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._resetAndReplaceFormToEvent();
+      this.destroy();
     }
   }
 

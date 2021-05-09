@@ -8,10 +8,14 @@ export const getRandomInteger = (a = 0, b = 1) => {
 export const changeFirstLetteToUpperCase = (str) =>
   str.length ? str[0].toUpperCase() + str.slice(1) : '';
 
-export const requiredValidator = (value) => {
+export const requiredValidator = (name) => (value) => {
   if (!value) {
-    return false;
+    return `${name} is required`;
   }
+};
 
-  return true;
+export const priceValidator = (value) => {
+  if (value <= 0) {
+    return 'Price must be a positive number';
+  }
 };

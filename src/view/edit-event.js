@@ -1,9 +1,11 @@
+import he from 'he';
+
 import Smart from './smart';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 import { PICKER_OPTIONS } from '../constants';
-import { requiredValidator } from '../utils/common';
+import { requiredValidator, priceValidator } from '../utils/common';
 
 const getDestinationTypeItem = (eventType) => (type) => {
   return `<div class="event__type-item">
@@ -102,7 +104,7 @@ export const createEditEventTemplate = (
 ) => {
   const {
     type = '',
-    price = '0',
+    price = '',
     startDate,
     endDate,
     currentDestination,
@@ -137,7 +139,7 @@ export const createEditEventTemplate = (
             ${type}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-            value="${destinationName}" list="destination-list-1">
+            value="${he.encode(destinationName)}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${getDestinationOptions(destinations)}
           </datalist>
@@ -163,7 +165,7 @@ export const createEditEventTemplate = (
             id="event-price-1"
             type="text"
             name="event-price"
-            value="${price}">
+            value="${he.encode(price + '')}">
         </div>
 
         <button
@@ -204,10 +206,10 @@ export default class EditEvent extends Smart {
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
+    this._handleBlur = this._handleBlur.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickers();
-    this.disableSaveButton();
     this._touched = {};
   }
 
@@ -218,40 +220,40 @@ export default class EditEvent extends Smart {
 
     this._touched[type] = true;
 
+    this._validate();
+  }
+
+  _validate() {
     const validState = this._getValidFormState(this._data);
 
     if (validState.isValid) {
-      this.enableSaveButton();
-      this.hideErrorMessage();
+      this._hideErrorMessage();
     } else {
-      this.showErrorMessage(validState.messages.join(', '));
-      this.disableSaveButton();
+      this._showErrorMessage(validState.messages.join(', '));
     }
+
+    return validState;
   }
 
-  disableSaveButton() {
-    this.getElement()
-      .querySelector('.event__save-btn')
-      .setAttribute('disabled', true);
+  _markAllAsTouched() {
+    const config = this._getValidateConfig();
+
+    Object.keys(config).forEach((field) => {
+      this._touched[field] = true;
+    });
   }
 
-  enableSaveButton() {
-    this.getElement()
-      .querySelector('.event__save-btn')
-      .removeAttribute('disabled');
-  }
-
-  showErrorMessage(message) {
+  _showErrorMessage(message) {
     if (message) {
       const errorElement = this.getElement().querySelector('.event__errors');
       errorElement.textContent = message;
       errorElement.classList.add('event__errors--active');
     } else {
-      this.hideErrorMessage();
+      this._hideErrorMessage();
     }
   }
 
-  hideErrorMessage() {
+  _hideErrorMessage() {
     const errorElement = this.getElement().querySelector('.event__errors');
     errorElement.textContent = '';
     errorElement.classList.remove('event__errors--active');
@@ -302,13 +304,19 @@ export default class EditEvent extends Smart {
   }
 
   _setInnerHandlers() {
-    this.getElement()
-      .querySelector('.event__input--price')
-      .addEventListener('input', this._priceChangeHandler);
+    const price = this.getElement().querySelector('.event__input--price');
 
-    this.getElement()
-      .querySelector('.event__input--destination')
-      .addEventListener('change', this._destinationChangeHandler);
+    price.addEventListener('input', this._priceChangeHandler);
+    price.addEventListener('blur', this._handleBlur.bind(null, 'price'));
+
+    const destination = this.getElement().querySelector(
+      '.event__input--destination',
+    );
+    destination.addEventListener('change', this._destinationChangeHandler);
+    destination.addEventListener(
+      'blur',
+      this._handleBlur.bind(null, 'currentDestination'),
+    );
 
     Array.from(
       this.getElement().querySelectorAll('[name="event-type"]'),
@@ -323,6 +331,12 @@ export default class EditEvent extends Smart {
     );
   }
 
+  _handleBlur(type) {
+    this._touched[type] = true;
+
+    this._validate();
+  }
+
   getTemplate() {
     return createEditEventTemplate(
       this._eventTypes,
@@ -334,6 +348,15 @@ export default class EditEvent extends Smart {
 
   _submitHandler(e) {
     e.preventDefault();
+
+    this._markAllAsTouched();
+
+    const { isValid } = this._validate();
+
+    if (!isValid) {
+      return;
+    }
+
     this._callback.submit(
       EditEvent.parseDataToEvent(this._data, this._offers, this._destinations),
     );
@@ -474,7 +497,7 @@ export default class EditEvent extends Smart {
     {
       id,
       type,
-      price = '0',
+      price,
       isFavorite,
       startDate = new Date(),
       endDate = new Date(),
@@ -548,7 +571,7 @@ export default class EditEvent extends Smart {
       const valid = config[field].validate(event[field]);
       return {
         field,
-        message: valid ? '' : config[field].message,
+        message: valid,
       };
     });
 
@@ -558,24 +581,21 @@ export default class EditEvent extends Smart {
   _getValidateConfig() {
     return {
       currentDestination: {
-        message: 'Destination is required',
-        validate: requiredValidator,
+        validate: requiredValidator('Destination'),
       },
       type: {
-        message: 'Type is required',
-        validate: requiredValidator,
+        validate: requiredValidator('Type'),
       },
       startDate: {
-        message: 'Start date is required',
-        validate: requiredValidator,
+        validate: requiredValidator('Start date'),
       },
       endDate: {
-        message: 'Eend date is required',
-        validate: requiredValidator,
+        validate: requiredValidator('End date'),
       },
       price: {
-        message: 'Price is required',
-        validate: requiredValidator,
+        validate: (value) => {
+          return requiredValidator('Price')(value) || priceValidator(value);
+        },
       },
     };
   }
