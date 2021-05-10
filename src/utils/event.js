@@ -1,5 +1,8 @@
 import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { formatToShortDay } from './format';
+
+dayjs.extend(isSameOrBefore);
 
 export const calculateDuration = ({ startDate, endDate }) => {
   if (!startDate || !endDate) {
@@ -11,11 +14,11 @@ export const calculateDuration = ({ startDate, endDate }) => {
 
 export const calculateEventPrice = ({ price = 0, offers = [] } = {}) =>
   offers.reduce((acc, next) => {
-    return acc + next.price;
+    return +acc + +next.price;
   }, price);
 
 export const calculateTotal = (events) => {
-  return events.map(calculateEventPrice).reduce((acc, next) => acc + next, 0);
+  return events.map(calculateEventPrice).reduce((acc, next) => +acc + +next, 0);
 };
 
 export const sortAsNumberByProp = (prop) => (a, b) => +a[prop] - +b[prop];
@@ -45,7 +48,7 @@ export const caclucateEventsCities = (events = []) => {
 export const caclucateEventsDates = (events = []) => {
   const sorted = events.slice().sort(sortFromStartToEnd);
 
-  if (!sorted.len) {
+  if (!sorted.length) {
     return '';
   }
 
@@ -61,11 +64,23 @@ export const caclucateEventsDates = (events = []) => {
 };
 
 export const isEventInFuture = (date) => {
-  return date === null ? false : dayjs().isBefore(date, 'D');
+  return date === null ? false : dayjs().isSameOrBefore(date, 'D');
 };
 
 export const isEventInPast = (date) => {
   return date === null ? false : dayjs().isAfter(date, 'D');
+};
+
+export const isEventEverything = (startDate, endDate) => {
+  return !startDate || !endDate
+    ? false
+    : dayjs().isAfter(startDate, 'D') && dayjs().isBefore(endDate, 'D');
+};
+
+export const isDatesEqual = (dateA, dateB) => {
+  return dateA === null && dateB === null
+    ? true
+    : dayjs(dateA).isSame(dateB, 'D');
 };
 
 export const calculateFilterDisableState = (events) => {

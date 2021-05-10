@@ -11,7 +11,7 @@ import {
 } from '../utils';
 import Abstract from './abstarct';
 
-const getOfferTemplate = ({ price, name }) => {
+const getOfferTemplate = ({ price = '0', name }) => {
   return `<li class="event__offer">
     <span class="event__offer-title">${name}</span>
     &plus;&euro;&nbsp;
@@ -55,11 +55,14 @@ const createEventTemplate = (event = {}) => {
           ">${formatToTime(endDate)}</time>
         </p>
         <p class="event__duration">
-          ${formatToDuration(calculateDuration(startDate, endDate))}
+          ${formatToDuration(calculateDuration({ startDate, endDate }))}
         </p>
       </div>
       <p class="event__price">
-        &euro;&nbsp;<span class="event__price-value">${resultPrice}</span>
+        &euro;&nbsp;<span
+        class="event__price-value">
+        ${resultPrice || '0'}
+        </span>
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">

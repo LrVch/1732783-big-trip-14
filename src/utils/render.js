@@ -49,6 +49,10 @@ export const replace = (newChild, oldChild) => {
 };
 
 export const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
   if (!component.getElement) {
     throw new Error('Can remove only components');
   }

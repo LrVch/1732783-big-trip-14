@@ -8,12 +8,14 @@ export const getRandomInteger = (a = 0, b = 1) => {
 export const changeFirstLetteToUpperCase = (str) =>
   str.length ? str[0].toUpperCase() + str.slice(1) : '';
 
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
+export const requiredValidator = (name) => (value) => {
+  if (!value) {
+    return `${name} is required`;
   }
+};
 
-  return [...items.slice(0, index), update, ...items.slice(index + 1)];
+export const priceValidator = (value) => {
+  if (value <= 0) {
+    return 'Price must be a positive number';
+  }
 };
