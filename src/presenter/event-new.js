@@ -59,13 +59,6 @@ export default class EventNew {
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
   }
 
-  _onEscKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.destroy();
-    }
-  }
-
   _handleSubmit(event) {
     this._handleEventChange(
       UserAction.ADD_TASK,
@@ -78,7 +71,10 @@ export default class EventNew {
     this.destroy();
   }
 
-  _handleCancel() {
-    this._resetAndReplaceFormToEvent();
+  _onEscKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.destroy();
+    }
   }
 }
