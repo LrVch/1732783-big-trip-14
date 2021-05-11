@@ -45,6 +45,16 @@ export default class Filter {
     remove(prevFilterComponent);
   }
 
+  disable() {
+    this._disabled = true;
+    this._filterComponent.disable();
+  }
+
+  enable() {
+    this._disabled = false;
+    this._filterComponent.enable();
+  }
+
   _handleModelEvent() {
     this.init();
   }
@@ -54,15 +64,5 @@ export default class Filter {
       return;
     }
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
-  }
-
-  disable() {
-    this._disabled = true;
-    this._filterComponent.disable();
-  }
-
-  enable() {
-    this._disabled = false;
-    this._filterComponent.enable();
   }
 }
