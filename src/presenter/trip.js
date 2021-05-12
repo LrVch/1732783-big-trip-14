@@ -1,6 +1,7 @@
 import EventsListView from '../view/events-list';
 import NoEventsView from '../view/no-events';
 import SortView from '../view/sort';
+import LoadingView from '../view/loading';
 import {
   PlaceToInsert,
   remove,
@@ -16,12 +17,15 @@ import { SortType, UserAction, UpdateType } from '../constants';
 import { filter } from '../utils/filter';
 
 export default class Trip {
-  constructor(tripContainer, eventsModel, filterModel) {
+  constructor(tripContainer, eventsModel, filterModel, api, resoureManger) {
+    this._api = api;
+    this._resourseManger = resoureManger;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
     this._tripContainer = tripContainer;
     this._eventPresenter = {};
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
 
     this._eventsListComponent = new EventsListView();
     this._noEventsComponent = new NoEventsView();
@@ -35,7 +39,9 @@ export default class Trip {
     this._eventNewPresenter = new EventNewPresenter(
       this._eventsListComponent,
       this._handleViewAction,
+      this._resourseManger,
     );
+    this._loadingComponent = new LoadingView();
   }
 
   _getEvents() {
@@ -83,6 +89,11 @@ export default class Trip {
   }
 
   _renderTrip() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const events = this._getEvents();
 
     if (!events.length) {
@@ -118,6 +129,7 @@ export default class Trip {
       this._eventsListComponent,
       this._handleViewAction,
       this._handleModeChange,
+      this._resourseManger,
     );
     eventPresenter.init(event);
     this._eventPresenter[event.id] = eventPresenter;
@@ -131,6 +143,14 @@ export default class Trip {
     );
   }
 
+  _renderLoading() {
+    render(
+      this._tripContainer,
+      this._loadingComponent,
+      PlaceToInsert.AFTER_BEGIN,
+    );
+  }
+
   _renderEvents(events) {
     events.forEach((event) => this._renderEvent(event));
   }
@@ -138,9 +158,13 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_TASK:
-        this._eventsModel.updateEvent(updateType, update);
+        console.log('UPDATE_TASK', update);
+        this._api.updateEvent(update).then((response) => {
+          this._eventsModel.updateEvent(updateType, response);
+        });
         break;
       case UserAction.ADD_TASK:
+        console.log('ADD_TASK', update);
         this._eventsModel.addEvent(updateType, update);
         break;
       case UserAction.DELETE_TASK:
@@ -160,6 +184,11 @@ export default class Trip {
         break;
       case UpdateType.MAJOR:
         this._clearBoard({ resetSortType: true });
+        this._renderTrip();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderTrip();
         break;
     }
@@ -191,6 +220,7 @@ export default class Trip {
 
     remove(this._sortComponent);
     remove(this._noEventsComponent);
+    remove(this._loadingComponent);
 
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;

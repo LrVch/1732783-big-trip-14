@@ -29,7 +29,7 @@ const getEventOffers = (availableOffers = [], offerIdsMap) => {
           type="checkbox"
           name="event-offer-luggage"
           ${id in offerIdsMap ? 'checked' : ''}
-          value=${id}
+          value="${id}"
         >
         <label class="event__offer-label" for="event-offer-${id}">
           <span class="event__offer-title">${name}</span>
@@ -357,6 +357,8 @@ export default class EditEvent extends Smart {
       return;
     }
 
+    console.log('this._data', this._data);
+
     this._callback.submit(
       EditEvent.parseDataToEvent(this._data, this._offers, this._destinations),
     );
@@ -493,63 +495,6 @@ export default class EditEvent extends Smart {
     }
   }
 
-  static parseEventToData(
-    {
-      id,
-      type,
-      price,
-      isFavorite,
-      startDate = new Date(),
-      endDate = new Date(),
-      destination = {},
-      offerIds = [],
-    },
-    destinations,
-  ) {
-    return Object.assign(
-      {},
-      {
-        id,
-        type,
-        price,
-        isFavorite,
-        startDate,
-        endDate,
-        offerIdsMap: offerIds.reduce((acc, id) => {
-          return {
-            ...acc,
-            [id]: true,
-          };
-        }, {}),
-        currentDestination: destinations.find(
-          (elem) => elem.name === destination.name,
-        ),
-      },
-    );
-  }
-
-  static parseDataToEvent(data, availableOffers, destinations) {
-    data = Object.assign({}, data);
-
-    data.offerIds = Object.keys(data.offerIdsMap).filter(
-      (key) => data.offerIdsMap[key],
-    );
-    data.offers = (availableOffers[data.type] || []).filter(
-      (offer) => data.offerIdsMap[offer.id],
-    );
-
-    if (data.currentDestination) {
-      data.destination = destinations.find(
-        (elem) => elem.name === data.currentDestination.name,
-      );
-    }
-
-    delete data.currentDestination;
-    delete data.offerIdsMap;
-
-    return data;
-  }
-
   _getValidFormState(event) {
     const validationResult = this._validateEvent(event);
     return {
@@ -598,5 +543,66 @@ export default class EditEvent extends Smart {
         },
       },
     };
+  }
+
+  static parseEventToData(
+    {
+      id,
+      type,
+      price,
+      isFavorite,
+      startDate = new Date(),
+      endDate = new Date(),
+      destination = {},
+      offerIds = [],
+    },
+    destinations,
+  ) {
+    return Object.assign(
+      {},
+      {
+        id,
+        type,
+        price,
+        isFavorite,
+        startDate,
+        endDate,
+        offerIdsMap: offerIds.reduce((acc, id) => {
+          return {
+            ...acc,
+            [id]: true,
+          };
+        }, {}),
+        currentDestination: destinations.find(
+          (elem) => elem.name === destination.name,
+        ),
+      },
+    );
+  }
+
+  static parseDataToEvent(data, availableOffers, destinations) {
+    data = Object.assign({}, data);
+
+    // console.log('data', data);
+    // console.log('availableOffers', availableOffers);
+    // console.log('destinations', destinations);
+
+    data.offerIds = Object.keys(data.offerIdsMap).filter(
+      (key) => data.offerIdsMap[key],
+    );
+    data.offers = (availableOffers[data.type] || []).filter(
+      (offer) => data.offerIdsMap[offer.id],
+    );
+
+    if (data.currentDestination) {
+      data.destination = destinations.find(
+        (elem) => elem.name === data.currentDestination.name,
+      );
+    }
+
+    delete data.currentDestination;
+    delete data.offerIdsMap;
+
+    return data;
   }
 }

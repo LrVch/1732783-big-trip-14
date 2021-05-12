@@ -1,5 +1,5 @@
 import { EVENT_TYPES } from '../constants';
-import { destinations, offers } from '../mock/event';
+// import { destinations, offers } from '../mock/event';
 import EventView from '../view/event';
 import EditEventView from '../view/edit-event';
 import { isDatesEqual, PlaceToInsert, remove, render, replace } from '../utils';
@@ -11,10 +11,16 @@ const Mode = {
 };
 
 export default class Event {
-  constructor(eventsListContainer, handleEventChange, handleModeChange) {
+  constructor(
+    eventsListContainer,
+    handleEventChange,
+    handleModeChange,
+    resourseManger,
+  ) {
     this._eventsListContainer = eventsListContainer;
     this._handleEventChange = handleEventChange;
     this._handleModeChange = handleModeChange;
+    this._resourseManger = resourseManger;
 
     this._eventComponent = null;
     this._editEventComponent = null;
@@ -33,6 +39,8 @@ export default class Event {
 
     const prevEventComponent = this._eventComponent;
     const prevEditEventComponent = this._editEventComponent;
+
+    const { destinations, offers } = this._resourseManger.getResourses();
 
     this._eventComponent = new EventView(event);
     this._editEventComponent = new EditEventView(
