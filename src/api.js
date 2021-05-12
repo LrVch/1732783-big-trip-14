@@ -38,6 +38,24 @@ export default class Api {
       .then(EventsModel.adaptToClient);
   }
 
+  addEvent(event) {
+    return this._request({
+      url: 'points',
+      method: Method.POST,
+      body: JSON.stringify(EventsModel.adaptToServer(event)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    })
+      .then(Api.toJSON)
+      .then(EventsModel.adaptToClient);
+  }
+
+  deleteEvent(id) {
+    return this._request({
+      url: `points/${id}`,
+      method: Method.DELETE,
+    });
+  }
+
   _request({ url, method = Method.GET, body = null, headers = new Headers() }) {
     headers.append('Authorization', this._authorization);
 

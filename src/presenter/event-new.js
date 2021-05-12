@@ -59,6 +59,25 @@ export default class EventNew {
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
   }
 
+  setSaving() {
+    this._editEventComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._editEventComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._editEventComponent.shake(resetFormState);
+  }
+
   _handleSubmit(event) {
     this._handleEventChange(
       UserAction.ADD_TASK,

@@ -1,5 +1,4 @@
 import { EVENT_TYPES } from '../constants';
-// import { destinations, offers } from '../mock/event';
 import EventView from '../view/event';
 import EditEventView from '../view/edit-event';
 import { isDatesEqual, PlaceToInsert, remove, render, replace } from '../utils';
@@ -8,6 +7,12 @@ import { UserAction, UpdateType } from '../constants';
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
+};
+
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
 };
 
 export default class Event {
@@ -73,7 +78,8 @@ export default class Event {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._editEventComponent, prevEditEventComponent);
+      replace(this._eventComponent, prevEditEventComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevEventComponent);
@@ -88,6 +94,35 @@ export default class Event {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._resetAndReplaceFormToEvent();
+    }
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._editEventComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editEventComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editEventComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._eventComponent.shake(resetFormState);
+        this._editEventComponent.shake(resetFormState);
+        break;
     }
   }
 
@@ -125,12 +160,9 @@ export default class Event {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       Object.assign({}, event),
     );
-
-    this._replaceFormToEvent();
   }
 
   _handleDelete(event) {
-    this._replaceFormToEvent();
     this._handleEventChange(
       UserAction.DELETE_TASK,
       UpdateType.MINOR,

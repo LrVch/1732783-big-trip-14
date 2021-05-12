@@ -11,7 +11,9 @@ import {
   // eslint-disable-next-line comma-dangle
   sortFromStartToEnd,
 } from '../utils';
-import EventPresenter from '../presenter/event';
+import EventPresenter, {
+  State as EventPresenterViewState,
+} from '../presenter/event';
 import EventNewPresenter from '../presenter/event-new';
 import { SortType, UserAction, UpdateType } from '../constants';
 import { filter } from '../utils/filter';
@@ -158,17 +160,45 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_TASK:
-        console.log('UPDATE_TASK', update);
-        this._api.updateEvent(update).then((response) => {
-          this._eventsModel.updateEvent(updateType, response);
-        });
+        this._eventPresenter[update.id].setViewState(
+          EventPresenterViewState.SAVING,
+        );
+        this._api
+          .updateEvent(update)
+          .then((response) => {
+            this._eventsModel.updateEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventPresenter[update.id].setViewState(
+              EventPresenterViewState.ABORTING,
+            );
+          });
         break;
       case UserAction.ADD_TASK:
-        console.log('ADD_TASK', update);
-        this._eventsModel.addEvent(updateType, update);
+        this._eventNewPresenter.setSaving();
+        this._api
+          .addEvent(update)
+          .then((response) => {
+            this._eventsModel.addEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventNewPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_TASK:
-        this._eventsModel.deleteEvent(updateType, update);
+        this._eventPresenter[update.id].setViewState(
+          EventPresenterViewState.DELETING,
+        );
+        this._api
+          .deleteEvent(update.id)
+          .then(() => {
+            this._eventsModel.deleteEvent(updateType, update);
+          })
+          .catch(() => {
+            this._eventPresenter[update.id].setViewState(
+              EventPresenterViewState.ABORTING,
+            );
+          });
         break;
     }
   }
