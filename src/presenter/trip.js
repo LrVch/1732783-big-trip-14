@@ -84,11 +84,15 @@ export default class Trip {
   }
 
   disableSort() {
-    this._sortComponent.disable();
+    if (this._sortComponent) {
+      this._sortComponent.disable();
+    }
   }
 
   enableSort() {
-    this._sortComponent.enable();
+    if (this._sortComponent) {
+      this._sortComponent.enable();
+    }
   }
 
   _renderTrip() {
