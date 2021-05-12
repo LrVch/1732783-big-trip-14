@@ -12,6 +12,7 @@ import {
   sortFromStartToEnd,
 } from '../utils';
 import EventPresenter, {
+  // eslint-disable-next-line comma-dangle
   State as EventPresenterViewState,
 } from '../presenter/event';
 import EventNewPresenter from '../presenter/event-new';
