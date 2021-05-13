@@ -20,16 +20,17 @@ const getDestinationTypeItem = (eventType) => (type) => {
   </div>`;
 };
 
-const getEventOffers = (availableOffers = [], offerIdsMap) => {
+const getEventOffers = (availableOffers = [], offerIdsMap, isDisabled) => {
   return availableOffers
     .map(
       ({ id, name, price }) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden"
+          ${isDisabled ? 'disabled' : ''}
           id="event-offer-${id}"
           type="checkbox"
           name="event-offer-luggage"
-          ${id in offerIdsMap ? 'checked' : ''}
-          value=${id}
+          ${offerIdsMap[id] ? 'checked' : ''}
+          value="${id}"
         >
         <label class="event__offer-label" for="event-offer-${id}">
           <span class="event__offer-title">${name}</span>
@@ -54,14 +55,19 @@ const getOffersTitle = (isShow) =>
     ? '<h3 class="event__section-title event__section-title--offers">Offers</h3>'
     : '';
 
-const getOffersSection = (availableOffers = [], offerIdsMap, type) => {
+const getOffersSection = (
+  availableOffers = [],
+  offerIdsMap,
+  type,
+  isDisabled,
+) => {
   const isAwailableOffers = (availableOffers[type] || []).length;
   return isAwailableOffers
     ? `<section class="event__section  event__section--offers">
     ${getOffersTitle(availableOffers[type])}
 
     <div class="event__available-offers">
-      ${getEventOffers(availableOffers[type] || [], offerIdsMap)}
+      ${getEventOffers(availableOffers[type] || [], offerIdsMap, isDisabled)}
     </div>
   </section>`
     : '';
@@ -110,6 +116,9 @@ export const createEditEventTemplate = (
     currentDestination,
     offerIdsMap,
     id,
+    isDisabled,
+    isSaving,
+    isDeleting,
   } = data;
 
   const isEdit = !!id;
@@ -124,7 +133,9 @@ export const createEditEventTemplate = (
             <span class="visually-hidden">Choose event type</span>
             ${getTypeImage(type)}
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input
+            ${isDisabled ? 'disabled' : ''}
+            class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -138,7 +149,9 @@ export const createEditEventTemplate = (
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
+          <input
+            ${isDisabled ? 'disabled' : ''}
+            class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
             value="${he.encode(destinationName)}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${getDestinationOptions(destinations)}
@@ -147,11 +160,15 @@ export const createEditEventTemplate = (
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time event__input-start-date" id="event-start-time-1" type="text" name="event-start-time"
+          <input
+            ${isDisabled ? 'disabled' : ''}
+            class="event__input  event__input--time event__input-start-date" id="event-start-time-1" type="text" name="event-start-time"
             value="${startDate}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time event__input-end-date" id="event-end-time-1" type="text" name="event-end-time"
+          <input
+            ${isDisabled ? 'disabled' : ''}
+            class="event__input  event__input--time event__input-end-date" id="event-end-time-1" type="text" name="event-end-time"
             value="${endDate}">
         </div>
 
@@ -161,6 +178,7 @@ export const createEditEventTemplate = (
             &euro;
           </label>
           <input
+            ${isDisabled ? 'disabled' : ''}
             class="event__input  event__input--price"
             id="event-price-1"
             type="text"
@@ -169,15 +187,24 @@ export const createEditEventTemplate = (
         </div>
 
         <button
-          class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type=${isEdit ? 'button' : 'reset'}>
-          ${isEdit ? 'Delete' : 'Cancel'}
+          class="event__save-btn  btn  btn--blue"
+          type="submit"
+          ${isDisabled ? 'disabled' : ''}
+        >
+          ${isSaving ? 'Saving...' : 'Save'}
+          </button>
+        <button
+          class="event__reset-btn"
+          type=${isEdit ? 'button' : 'reset'}
+          ${isDisabled ? 'disabled' : ''}
+        >
+          ${isEdit ? (isDeleting ? 'Deleting...' : 'Delete') : 'Cancel'}
         </button>
         ${getEventCloseButton(isEdit)}
       </header>
 
       <section class="event__details">
-        ${getOffersSection(availableOffers, offerIdsMap, type)}
+        ${getOffersSection(availableOffers, offerIdsMap, type, isDisabled)}
 
         ${getDestination(currentDestination)}
       </section>
@@ -493,63 +520,6 @@ export default class EditEvent extends Smart {
     }
   }
 
-  static parseEventToData(
-    {
-      id,
-      type,
-      price,
-      isFavorite,
-      startDate = new Date(),
-      endDate = new Date(),
-      destination = {},
-      offerIds = [],
-    },
-    destinations,
-  ) {
-    return Object.assign(
-      {},
-      {
-        id,
-        type,
-        price,
-        isFavorite,
-        startDate,
-        endDate,
-        offerIdsMap: offerIds.reduce((acc, id) => {
-          return {
-            ...acc,
-            [id]: true,
-          };
-        }, {}),
-        currentDestination: destinations.find(
-          (elem) => elem.name === destination.name,
-        ),
-      },
-    );
-  }
-
-  static parseDataToEvent(data, availableOffers, destinations) {
-    data = Object.assign({}, data);
-
-    data.offerIds = Object.keys(data.offerIdsMap).filter(
-      (key) => data.offerIdsMap[key],
-    );
-    data.offers = (availableOffers[data.type] || []).filter(
-      (offer) => data.offerIdsMap[offer.id],
-    );
-
-    if (data.currentDestination) {
-      data.destination = destinations.find(
-        (elem) => elem.name === data.currentDestination.name,
-      );
-    }
-
-    delete data.currentDestination;
-    delete data.offerIdsMap;
-
-    return data;
-  }
-
   _getValidFormState(event) {
     const validationResult = this._validateEvent(event);
     return {
@@ -598,5 +568,68 @@ export default class EditEvent extends Smart {
         },
       },
     };
+  }
+
+  static parseEventToData(
+    {
+      id,
+      type,
+      price,
+      isFavorite,
+      startDate = new Date(),
+      endDate = new Date(),
+      destination = {},
+      offerIds = [],
+    },
+    destinations,
+  ) {
+    return Object.assign(
+      {},
+      {
+        id,
+        type,
+        price,
+        isFavorite,
+        startDate,
+        endDate,
+        offerIdsMap: offerIds.reduce((acc, id) => {
+          return {
+            ...acc,
+            [id]: true,
+          };
+        }, {}),
+        currentDestination: destinations.find(
+          (elem) => elem.name === destination.name,
+        ),
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      },
+    );
+  }
+
+  static parseDataToEvent(data, availableOffers, destinations) {
+    data = Object.assign({}, data);
+
+    data.offerIds = Object.keys(data.offerIdsMap).filter(
+      (key) => data.offerIdsMap[key],
+    );
+    data.offers = (availableOffers[data.type] || []).filter(
+      (offer) => data.offerIdsMap[offer.id],
+    );
+
+    if (data.currentDestination) {
+      data.destination = destinations.find(
+        (elem) => elem.name === data.currentDestination.name,
+      );
+    }
+
+    delete data.currentDestination;
+    delete data.offerIdsMap;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
   }
 }

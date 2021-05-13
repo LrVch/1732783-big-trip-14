@@ -1,5 +1,4 @@
 import { calculateDuration } from './event';
-import { formatToDuration } from './format';
 
 const transformMapToArray = (map) => {
   return Object.keys(map).map((key) => ({
@@ -37,15 +36,6 @@ export const getTimeSpendByType = (events) => {
     return {
       ...acc,
       [type]: (acc[type] || 0) + calculateDuration(next),
-    };
-  }, {});
-};
-
-export const formaTimeSpendtToDuration = (map) => {
-  return Object.keys(map).reduce((acc, next) => {
-    return {
-      ...acc,
-      [next]: formatToDuration(map[next]),
     };
   }, {});
 };

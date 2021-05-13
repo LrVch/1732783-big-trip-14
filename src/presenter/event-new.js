@@ -1,15 +1,13 @@
-import { nanoid } from 'nanoid';
-
 import { EVENT_TYPES } from '../constants';
-import { destinations, offers } from '../mock/event';
 import EditEventView from '../view/edit-event';
 import { PlaceToInsert, remove, render } from '../utils';
 import { UserAction, UpdateType } from '../constants';
 
 export default class EventNew {
-  constructor(eventsListContainer, handleEventChange) {
+  constructor(eventsListContainer, handleEventChange, resourseManger) {
     this._eventsListContainer = eventsListContainer;
     this._handleEventChange = handleEventChange;
+    this.__resourseManger = resourseManger;
 
     this._editEventComponent = null;
     this._destroyCallback = null;
@@ -25,6 +23,8 @@ export default class EventNew {
     if (this._editEventComponent !== null) {
       return;
     }
+
+    const { destinations, offers } = this.__resourseManger.getResourses();
 
     this._editEventComponent = new EditEventView(
       EVENT_TYPES,
@@ -59,11 +59,30 @@ export default class EventNew {
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
   }
 
+  setSaving() {
+    this._editEventComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._editEventComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._editEventComponent.shake(resetFormState);
+  }
+
   _handleSubmit(event) {
     this._handleEventChange(
       UserAction.ADD_TASK,
       UpdateType.MINOR,
-      Object.assign(event, { id: nanoid() }),
+      Object.assign(event, { isFavorite: false }),
     );
   }
 

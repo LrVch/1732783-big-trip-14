@@ -7,8 +7,14 @@ import TripInfoPresenter from './presenter/tripInfo';
 import EventsModel from './model/events';
 import FilterModel from './model/fiter';
 import { NavigationItems, UpdateType, FilterType } from './constants';
+import Api from './api.js';
+import resourseManger from './resoureManager';
 
-import { generateEvent } from './mock/event';
+const showCommonErrorNotification = () =>
+  alert(
+    'Something went wrong :(, we are working on it, take a deep breath and try again.',
+  );
+
 import {
   PlaceToInsert,
   remove,
@@ -16,14 +22,10 @@ import {
   render,
 } from './utils';
 
-const EVENTS_COUNT = 20;
+const AUTHORIZATION = 'Basic really strong authorization';
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
-const events = Array(EVENTS_COUNT).fill().map(generateEvent);
-
-const eventsModel = new EventsModel();
-eventsModel.setEvents(events);
-
-const filterModel = new FilterModel();
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const mainElement = document.querySelector('.page-body');
 const mainBodyElement = mainElement.querySelector(
@@ -40,13 +42,14 @@ const tripEventsElement = mainElement.querySelector('.trip-events');
 const navigationComponent = new NavigationView();
 const newEventComponent = new NewEventView();
 
-render(navigationElement, navigationComponent, PlaceToInsert.BEFORE_END);
-render(tripMenuMainElement, newEventComponent, PlaceToInsert.BEFORE_END);
-
+const eventsModel = new EventsModel();
+const filterModel = new FilterModel();
 const tripPresenter = new TripPresenter(
   tripEventsElement,
   eventsModel,
   filterModel,
+  api,
+  resourseManger,
 );
 const filterPresenter = new FilterPresenter(
   filterElement,
@@ -56,8 +59,6 @@ const filterPresenter = new FilterPresenter(
 
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, eventsModel);
 
-tripInfoPresenter.init();
-filterPresenter.init();
 tripPresenter.init();
 
 let statisticsComponent = null;
@@ -91,7 +92,6 @@ const handleSiteMenuClick = (item) => {
       navigationComponent.setMenuItem(NavigationItems.TABLE);
       filterPresenter.enable();
       newEventComponent.enable();
-      // filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       tripPresenter.init();
       break;
     case NavigationItems.STATS:
@@ -110,3 +110,42 @@ const handleSiteMenuClick = (item) => {
 
 newEventComponent.setClickHandler(handleSiteMenuClick);
 navigationComponent.setMenuClickHandler(handleSiteMenuClick);
+
+const criticalResounses = Promise.all([api.getDestinations(), api.getOffers()]);
+
+Promise.allSettled([api.getEvents(), criticalResounses]).then(
+  ([
+    { value: events, reason: eventsReason },
+    { value: resourses, reason: resoursesReason },
+  ]) => {
+    if (resoursesReason) {
+      // eslint-disable-next-line no-console
+      console.error(resoursesReason);
+      return showCommonErrorNotification();
+    }
+
+    const [destinations, offers] = resourses;
+
+    try {
+      resourseManger.setResourses({ destinations, offers });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return showCommonErrorNotification();
+    }
+
+    tripInfoPresenter.init();
+    filterPresenter.init();
+
+    if (eventsReason) {
+      eventsModel.setEvents(UpdateType.INIT, []);
+      render(navigationElement, navigationComponent, PlaceToInsert.BEFORE_END);
+      render(tripMenuMainElement, newEventComponent, PlaceToInsert.BEFORE_END);
+      return;
+    }
+
+    eventsModel.setEvents(UpdateType.INIT, events);
+    render(navigationElement, navigationComponent, PlaceToInsert.BEFORE_END);
+    render(tripMenuMainElement, newEventComponent, PlaceToInsert.BEFORE_END);
+  },
+);
