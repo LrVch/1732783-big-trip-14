@@ -81,8 +81,6 @@ export default class Filter extends Abstract {
   }
 
   enable(disabledState) {
-    console.log('enable');
-    console.log('disabledState', disabledState);
     Array.from(this.getElement()['trip-filter']).forEach((radio) => {
       if (disabledState[radio.dataset.type]) {
         radio.removeAttribute('disabled');
