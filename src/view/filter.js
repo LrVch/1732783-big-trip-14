@@ -28,6 +28,7 @@ const createFilterTemplate = (
       value="future"
       ${disabled || !isFuture ? 'disabled' : ''}
       ${FilterType.FUTURE === currentFilterType ? 'checked' : ''}
+      data-type="isFuture"
       >
       <label class="trip-filters__filter-label" for="filter-future">Future</label>
     </div>
@@ -41,6 +42,7 @@ const createFilterTemplate = (
       value="past"
       ${disabled || !isPast ? 'disabled' : ''}
       ${FilterType.PAST === currentFilterType ? 'checked' : ''}
+      data-type="isPast"
       >
       <label class="trip-filters__filter-label" for="filter-past">Past</label>
     </div>
@@ -78,9 +80,11 @@ export default class Filter extends Abstract {
     });
   }
 
-  enable() {
+  enable(disabledState) {
     Array.from(this.getElement()['trip-filter']).forEach((radio) => {
-      radio.removeAttribute('disabled');
+      if (disabledState[radio.dataset.type]) {
+        radio.removeAttribute('disabled');
+      }
     });
   }
 
