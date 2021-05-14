@@ -51,8 +51,12 @@ export default class Filter {
   }
 
   enable() {
+    const disabledState = calculateFilterDisableState(
+      this._eventsModel.getEvents(),
+    );
+
     this._disabled = false;
-    this._filterComponent.enable();
+    this._filterComponent.enable(disabledState);
   }
 
   _handleModelEvent() {
