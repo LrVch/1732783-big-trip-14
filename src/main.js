@@ -8,7 +8,7 @@ import EventsModel from './model/events';
 import FilterModel from './model/fiter';
 import { NavigationItems, UpdateType, FilterType } from './constants';
 import Api from './api.js';
-import resourseManger from './resoureManager';
+import resourseManger from './resourse-manager';
 
 const showCommonErrorNotification = () =>
   alert(
