@@ -6,8 +6,7 @@ import {
   getCountByTypeAsArray,
   getMoneySpendByTypeAsArray,
   sortByValueDesc,
-  // eslint-disable-next-line comma-dangle
-  getTimeSpendByTypeAsArray,
+  getTimeSpendByTypeAsArray
 } from '../utils/stats.js';
 import { formatToDuration } from '../utils/format.js';
 

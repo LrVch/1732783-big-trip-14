@@ -25,7 +25,7 @@ export const PICKER_OPTIONS = {
   enableTime: true,
   dateFormat: 'd/m/y H:i',
   altFormat: 'd/m/y H:i',
-  time_24hr: true,
+  'time_24hr': true,
 };
 
 export const UserAction = {

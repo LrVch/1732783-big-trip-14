@@ -20,8 +20,7 @@ export default class Events extends Observer {
     const index = this._events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
-      // eslint-disable-next-line quotes
-      throw new Error("Can't update unexisting event");
+      throw new Error('Can\'t update unexisting event');
     }
 
     this._events = [
@@ -43,8 +42,7 @@ export default class Events extends Observer {
     const index = this._events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
-      // eslint-disable-next-line quotes
-      throw new Error("Can't delete unexisting event");
+      throw new Error('Can\'t delete unexisting event');
     }
 
     this._events = [
@@ -79,10 +77,10 @@ export default class Events extends Observer {
 
   static adaptToServer(event) {
     const adaptedTask = Object.assign({}, event, {
-      base_price: Number(event.price),
-      date_from: event.startDate.toISOString(),
-      date_to: event.endDate.toISOString(),
-      is_favorite: event.isFavorite,
+      'base_price': Number(event.price),
+      'date_from': event.startDate.toISOString(),
+      'date_to': event.endDate.toISOString(),
+      'is_favorite': event.isFavorite,
       offers: event.offers.map((offer) => ({
         title: offer.name,
         price: offer.price,

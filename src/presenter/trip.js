@@ -8,12 +8,10 @@ import {
   render,
   sortByDuration,
   sortByPrice,
-  // eslint-disable-next-line comma-dangle
-  sortFromStartToEnd,
+  sortFromStartToEnd
 } from '../utils';
 import EventPresenter, {
-  // eslint-disable-next-line comma-dangle
-  State as EventPresenterViewState,
+  State as EventPresenterViewState
 } from '../presenter/event';
 import EventNewPresenter from '../presenter/event-new';
 import { SortType, UserAction, UpdateType } from '../constants';

@@ -4,8 +4,7 @@ import TripInfoView from '../view/trip-info';
 import {
   caclucateEventsCities,
   caclucateEventsDates,
-  // eslint-disable-next-line comma-dangle
-  calculateTotal,
+  calculateTotal
 } from '../utils';
 
 export default class TripInfo {

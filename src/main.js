@@ -18,8 +18,7 @@ const showCommonErrorNotification = () =>
 import {
   PlaceToInsert,
   remove,
-  // eslint-disable-next-line comma-dangle
-  render,
+  render
 } from './utils';
 
 const AUTHORIZATION = 'Basic really strong authorization';
@@ -119,8 +118,6 @@ Promise.allSettled([api.getEvents(), criticalResounses]).then(
     { value: resourses, reason: resoursesReason },
   ]) => {
     if (resoursesReason) {
-      // eslint-disable-next-line no-console
-      console.error(resoursesReason);
       return showCommonErrorNotification();
     }
 
@@ -129,8 +126,6 @@ Promise.allSettled([api.getEvents(), criticalResounses]).then(
     try {
       resourseManger.setResourses({ destinations, offers });
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
       return showCommonErrorNotification();
     }
 

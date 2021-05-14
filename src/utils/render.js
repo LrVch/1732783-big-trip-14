@@ -26,8 +26,7 @@ export const render = (container, child, place) => {
 
 export const replace = (newChild, oldChild) => {
   if (!oldChild || !newChild) {
-    // eslint-disable-next-line quotes
-    throw new Error("Can't replace unexisting elements");
+    throw new Error('Can\'t replace unexisting elements');
   }
 
   if (oldChild.getElement) {
@@ -41,8 +40,7 @@ export const replace = (newChild, oldChild) => {
   const parent = oldChild.parentElement;
 
   if (!parent) {
-    // eslint-disable-next-line quotes
-    throw new Error("Can't replace, parent doesn't exist");
+    throw new Error('Can\'t replace, parent doesn\'t exist');
   }
 
   parent.replaceChild(newChild, oldChild);

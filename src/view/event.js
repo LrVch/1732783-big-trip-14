@@ -6,8 +6,7 @@ import {
   formatToTime,
   formatToDuration,
   calculateDuration,
-  // eslint-disable-next-line comma-dangle
-  calculateEventPrice,
+  calculateEventPrice
 } from '../utils';
 import Abstract from './abstarct';
 
