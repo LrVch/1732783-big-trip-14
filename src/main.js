@@ -8,18 +8,14 @@ import EventsModel from './model/events';
 import FilterModel from './model/fiter';
 import { NavigationItems, UpdateType, FilterType } from './constants';
 import Api from './api.js';
-import resourseManger from './resourse-manager';
+import resourceManger from './resource-manager';
 
 const showCommonErrorNotification = () =>
   alert(
     'Something went wrong :(, we are working on it, take a deep breath and try again.',
   );
 
-import {
-  PlaceToInsert,
-  remove,
-  render
-} from './utils';
+import { PlaceToInsert, remove, render } from './utils';
 
 const AUTHORIZATION = 'Basic really strong authorization';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
@@ -48,7 +44,7 @@ const tripPresenter = new TripPresenter(
   eventsModel,
   filterModel,
   api,
-  resourseManger,
+  resourceManger,
 );
 const filterPresenter = new FilterPresenter(
   filterElement,
@@ -110,21 +106,21 @@ const handleSiteMenuClick = (item) => {
 newEventComponent.setClickHandler(handleSiteMenuClick);
 navigationComponent.setMenuClickHandler(handleSiteMenuClick);
 
-const criticalResounses = Promise.all([api.getDestinations(), api.getOffers()]);
+const criticalResources = Promise.all([api.getDestinations(), api.getOffers()]);
 
-Promise.allSettled([api.getEvents(), criticalResounses]).then(
+Promise.allSettled([api.getEvents(), criticalResources]).then(
   ([
     { value: events, reason: eventsReason },
-    { value: resourses, reason: resoursesReason },
+    { value: resources, reason: resourcesReason },
   ]) => {
-    if (resoursesReason) {
+    if (resourcesReason) {
       return showCommonErrorNotification();
     }
 
-    const [destinations, offers] = resourses;
+    const [destinations, offers] = resources;
 
     try {
-      resourseManger.setResourses({ destinations, offers });
+      resourceManger.setResources({ destinations, offers });
     } catch (error) {
       return showCommonErrorNotification();
     }

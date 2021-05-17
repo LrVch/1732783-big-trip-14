@@ -16,7 +16,7 @@ export const DAY = ONE_HOUR * 24;
 
 export const SortType = {
   DEFAULT: 'default',
-  DURATION: 'diration',
+  DURATION: 'duration',
   PRICE: 'price',
 };
 

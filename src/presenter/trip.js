@@ -18,9 +18,9 @@ import { SortType, UserAction, UpdateType } from '../constants';
 import { filter } from '../utils/filter';
 
 export default class Trip {
-  constructor(tripContainer, eventsModel, filterModel, api, resoureManger) {
+  constructor(tripContainer, eventsModel, filterModel, api, resourceManager) {
     this._api = api;
-    this._resourseManger = resoureManger;
+    this._resourceManager = resourceManager;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
     this._tripContainer = tripContainer;
@@ -40,7 +40,7 @@ export default class Trip {
     this._eventNewPresenter = new EventNewPresenter(
       this._eventsListComponent,
       this._handleViewAction,
-      this._resourseManger,
+      this._resourceManager,
     );
     this._loadingComponent = new LoadingView();
   }
@@ -134,7 +134,7 @@ export default class Trip {
       this._eventsListComponent,
       this._handleViewAction,
       this._handleModeChange,
-      this._resourseManger,
+      this._resourceManager,
     );
     eventPresenter.init(event);
     this._eventPresenter[event.id] = eventPresenter;

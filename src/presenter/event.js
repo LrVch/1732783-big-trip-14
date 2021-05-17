@@ -20,12 +20,12 @@ export default class Event {
     eventsListContainer,
     handleEventChange,
     handleModeChange,
-    resourseManger,
+    resourceManager,
   ) {
     this._eventsListContainer = eventsListContainer;
     this._handleEventChange = handleEventChange;
     this._handleModeChange = handleModeChange;
-    this._resourseManger = resourseManger;
+    this._resourceManager = resourceManager;
 
     this._eventComponent = null;
     this._editEventComponent = null;
@@ -45,7 +45,7 @@ export default class Event {
     const prevEventComponent = this._eventComponent;
     const prevEditEventComponent = this._editEventComponent;
 
-    const { destinations, offers } = this._resourseManger.getResourses();
+    const { destinations, offers } = this._resourceManager.getResources();
 
     this._eventComponent = new EventView(event);
     this._editEventComponent = new EditEventView(

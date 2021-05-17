@@ -4,16 +4,16 @@ class ResoureManger {
     this._destinations = [];
   }
 
-  setResourses({ destinations, offers }) {
+  setResources({ destinations, offers }) {
     if (!destinations.length || !offers.length) {
-      throw new Error('Not enough resouses');
+      throw new Error('Not enough resources');
     }
 
     this._destinations = destinations;
     this._offers = offers;
   }
 
-  getResourses() {
+  getResources() {
     return {
       destinations: this._destinations,
       offers: this._adaptOffersToClient(this._offers),

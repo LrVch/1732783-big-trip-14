@@ -537,7 +537,7 @@ export default class EditEvent extends Smart {
   _validateEvent(event) {
     const config = this._getValidateConfig();
 
-    const result = Object.keys(config).map((field) => {
+    const validatedFields = Object.keys(config).map((field) => {
       const valid = config[field].validate(event[field]);
       return {
         field,
@@ -545,7 +545,7 @@ export default class EditEvent extends Smart {
       };
     });
 
-    return result;
+    return validatedFields;
   }
 
   _getValidateConfig() {

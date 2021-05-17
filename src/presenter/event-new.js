@@ -4,10 +4,10 @@ import { PlaceToInsert, remove, render } from '../utils';
 import { UserAction, UpdateType } from '../constants';
 
 export default class EventNew {
-  constructor(eventsListContainer, handleEventChange, resourseManger) {
+  constructor(eventsListContainer, handleEventChange, resourceManager) {
     this._eventsListContainer = eventsListContainer;
     this._handleEventChange = handleEventChange;
-    this.__resourseManger = resourseManger;
+    this._resourceManager = resourceManager;
 
     this._editEventComponent = null;
     this._destroyCallback = null;
@@ -24,7 +24,7 @@ export default class EventNew {
       return;
     }
 
-    const { destinations, offers } = this.__resourseManger.getResourses();
+    const { destinations, offers } = this._resourceManager.getResources();
 
     this._editEventComponent = new EditEventView(
       EVENT_TYPES,
