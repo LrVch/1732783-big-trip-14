@@ -8,7 +8,7 @@ import EventsModel from './model/events';
 import FilterModel from './model/fiter';
 import { NavigationItems, UpdateType, FilterType } from './constants';
 import Api from './api.js';
-import resourceManger from './resource-manager';
+import resourceManager from './resource-manager';
 
 const showCommonErrorNotification = () =>
   alert(
@@ -44,7 +44,7 @@ const tripPresenter = new TripPresenter(
   eventsModel,
   filterModel,
   api,
-  resourceManger,
+  resourceManager,
 );
 const filterPresenter = new FilterPresenter(
   filterElement,
@@ -120,7 +120,7 @@ Promise.allSettled([api.getEvents(), criticalResources]).then(
     const [destinations, offers] = resources;
 
     try {
-      resourceManger.setResources({ destinations, offers });
+      resourceManager.setResources({ destinations, offers });
     } catch (error) {
       return showCommonErrorNotification();
     }
